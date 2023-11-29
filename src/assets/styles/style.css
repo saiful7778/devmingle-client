@@ -3,3 +3,25 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.nav-link {
+  @apply relative px-2 py-1;
+}
+.nav-link::before {
+  @apply bg-gray-800 absolute bottom-0 left-0 inline-block w-full duration-200 scale-0;
+  content: "";
+  height: 2px;
+}
+.nav-link:hover::before {
+  @apply scale-100;
+}
+.nav-link.active::before {
+  @apply scale-100;
+}
+
+.btn {
+  @apply active:focus:scale-95 duration-100;
+}
+.btn span {
+  @apply py-1 px-2;
+}
