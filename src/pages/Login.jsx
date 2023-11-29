@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import { Button, Spinner, TextInput } from "keep-react";
 import { useEffect } from "react";
 import { useState } from "react";
@@ -10,6 +11,7 @@ import {
 } from "react-simple-captcha";
 import PropTypes from "prop-types";
 import { Modal } from "keep-react";
+import { Link } from "react-router-dom";
 
 const Login = () => {
   const [messageStatus, setMessageStatus] = useState("");
@@ -114,6 +116,12 @@ const Login = () => {
           {spinner ? <Spinner color="info" size="sm" /> : "LOGIN"}
         </button>
       </form>
+      <p className="text-center text-sm mt-4">
+        Don't have any account?{" "}
+        <Link className="text-blue-600 italic underline" to="/register">
+          register
+        </Link>
+      </p>
       <Modal size="xl" show={showModal}>
         <Modal.Body>
           <div className="md:text-5xl text-3xl font-bold text-center my-10">
