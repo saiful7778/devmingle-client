@@ -62,7 +62,7 @@ const Navbar = () => {
         </div>
       </nav>
       <div
-        className={`fixed top-0 ${
+        className={`fixed z-[1000] top-0 ${
           showMobileMenu ? "left-0" : "-left-full"
         } min-h-screen p-4 shadow-md bg-white text-center duration-300 md:hidden`}
       >
@@ -83,7 +83,7 @@ const Navbar = () => {
 
 const UserLogout = () => {
   return (
-    <Button className="ml-2 p-0 btn" size="xs" type="primary">
+    <Button href="/login" className="ml-2 p-0 btn" size="xs" type="primary">
       Join us
     </Button>
   );
