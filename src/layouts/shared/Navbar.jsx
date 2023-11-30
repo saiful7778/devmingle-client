@@ -86,7 +86,7 @@ const Navbar = () => {
 
 const UserLogout = () => {
   return (
-    <Button href="/register" className="ml-2 p-0 btn" size="xs" type="primary">
+    <Button href="/login" className="ml-2 p-0 btn" size="xs" type="primary">
       Join us
     </Button>
   );

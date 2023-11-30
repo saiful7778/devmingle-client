@@ -14,6 +14,7 @@ import axios from "axios";
 import { updateProfile } from "firebase/auth";
 import Swal from "sweetalert2";
 import useAxios from "../hooks/useAxios";
+import errorStatus from "../utility/errorStatus";
 
 const Register = () => {
   const { register: signUp } = useAuth();
@@ -214,7 +215,10 @@ const UserRegister = (signUp, userData, setSpinner, reset, handleNavigate) => {
               }
             })
             .catch((err) => {
-              errorStatus(err);
+              Swal.fire({
+                icon: "error",
+                text: err,
+              });
               setSpinner(false);
             });
         })
@@ -227,25 +231,6 @@ const UserRegister = (signUp, userData, setSpinner, reset, handleNavigate) => {
       errorStatus(err);
       setSpinner(false);
     });
-};
-
-const errorStatus = (errorCode) => {
-  switch (errorCode.code) {
-    case "auth/email-already-in-use":
-      console.error(errorCode.code);
-      Swal.fire({
-        icon: "error",
-        text: "This email is already exist! please login",
-      });
-      break;
-    default:
-      console.error(errorCode);
-      Swal.fire({
-        icon: "error",
-        text: errorCode,
-      });
-      break;
-  }
 };
 
 export default Register;

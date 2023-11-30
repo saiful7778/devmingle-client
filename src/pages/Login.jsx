@@ -1,5 +1,5 @@
 /* eslint-disable react/no-unescaped-entities */
-import { Button, Spinner, TextInput, Modal } from "keep-react";
+import { Spinner, TextInput } from "keep-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { IoIosEye, IoIosEyeOff } from "react-icons/io";
@@ -8,14 +8,18 @@ import {
   LoadCanvasTemplateNoReload,
   validateCaptcha,
 } from "react-simple-captcha";
-import { Link } from "react-router-dom";
 import CheckError from "../components/CheckError";
+import useAuth from "../hooks/useAuth";
+import errorStatus from "../utility/errorStatus";
+import Swal from "sweetalert2";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 
 const Login = () => {
-  const [messageStatus, setMessageStatus] = useState("");
+  const { login } = useAuth();
   const [spinner, setSpinner] = useState(false);
   const [showPass, setShowPass] = useState(false);
-  const [showModal, setShowModal] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
   const {
     register,
     handleSubmit,
@@ -28,15 +32,30 @@ const Login = () => {
 
   const submitData = (e) => {
     setSpinner(true);
-    setMessageStatus("");
     const email = e.email;
     const pass = e.password;
     const captchaCode = e.captcha;
     if (validateCaptcha(captchaCode) === false) {
-      setMessageStatus("Invalid captcha");
-      return setShowModal(true);
+      Swal.fire({
+        icon: "error",
+        title: "Invalide captcha",
+      });
+      return setSpinner(false);
     }
-    setSpinner(false);
+    login(email, pass)
+      .then((res) => {
+        Swal.fire({
+          icon: "success",
+          title: res.user.displayName,
+          text: "Account successfully logged in!",
+        });
+        navigate(location.state ? location.state : "/");
+        setSpinner(false);
+      })
+      .catch((err) => {
+        errorStatus(err);
+        setSpinner(false);
+      });
   };
   return (
     <div className="lg:w-1/2 bg-white w-full mx-auto rounded-lg shadow-md p-4">
@@ -120,23 +139,6 @@ const Login = () => {
           register
         </Link>
       </p>
-      <Modal size="xl" show={showModal}>
-        <Modal.Body>
-          <div className="md:text-5xl text-3xl font-bold text-center my-10">
-            {messageStatus}
-          </div>
-        </Modal.Body>
-        <Modal.Footer className="flex justify-center">
-          <Button
-            type="primary"
-            color="error"
-            size="xs"
-            onClick={() => setShowModal((l) => !l)}
-          >
-            Close
-          </Button>
-        </Modal.Footer>
-      </Modal>
     </div>
   );
 };

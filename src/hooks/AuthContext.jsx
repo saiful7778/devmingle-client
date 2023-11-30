@@ -1,6 +1,7 @@
 import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
+  signInWithEmailAndPassword,
   signOut,
 } from "firebase/auth";
 import PropTypes from "prop-types";
@@ -18,6 +19,11 @@ const AuthContext = ({ children }) => {
     return createUserWithEmailAndPassword(auth, email, pass);
   };
 
+  const login = (email, pass) => {
+    setLoader(true);
+    return signInWithEmailAndPassword(auth, email, pass);
+  };
+
   const logout = () => {
     return signOut(auth);
   };
@@ -32,7 +38,7 @@ const AuthContext = ({ children }) => {
     };
   }, []);
 
-  const authInfo = { user, loader, register, logout };
+  const authInfo = { user, loader, register, login, logout };
 
   return (
     <AuthContextData.Provider value={authInfo}>
