@@ -1,21 +1,28 @@
-/* eslint-disable react/no-unescaped-entities */
-import { Button, Spinner, TextInput, Modal } from "keep-react";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
+import { Button, Modal, TextInput, Spinner } from "keep-react";
+import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import CheckError from "../components/CheckError";
 import { IoIosEye, IoIosEyeOff } from "react-icons/io";
 import {
   loadCaptchaEnginge,
   LoadCanvasTemplateNoReload,
   validateCaptcha,
 } from "react-simple-captcha";
-import { Link } from "react-router-dom";
-import CheckError from "../components/CheckError";
+import { Upload } from "keep-react";
 
-const Login = () => {
+const Register = () => {
   const [messageStatus, setMessageStatus] = useState("");
   const [spinner, setSpinner] = useState(false);
   const [showPass, setShowPass] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [fileName, setFileName] = useState("");
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setFileName(file.name);
+    }
+  };
   const {
     register,
     handleSubmit,
@@ -29,21 +36,32 @@ const Login = () => {
   const submitData = (e) => {
     setSpinner(true);
     setMessageStatus("");
-    const email = e.email;
-    const pass = e.password;
+    console.log(e);
     const captchaCode = e.captcha;
     if (validateCaptcha(captchaCode) === false) {
       setMessageStatus("Invalid captcha");
       return setShowModal(true);
     }
-    setSpinner(false);
   };
   return (
     <div className="lg:w-1/2 bg-white w-full mx-auto rounded-lg shadow-md p-4">
       <h3 className="text-blue-600 text-5xl font-bold text-center mb-6">
-        Login
+        Register
       </h3>
       <form onSubmit={handleSubmit(submitData)} className="space-y-3">
+        <input
+          type="file"
+          onChange={handleFileChange}
+          accept="image/*"
+          {...register("profilePic")}
+        />
+        <TextInput
+          placeholder="Full name"
+          {...register("fullName", { required: true })}
+        />
+        <CheckError error={errors} inputName="fullName" fieldName="required">
+          Name is required
+        </CheckError>
         <TextInput
           placeholder="Email address"
           type="email"
@@ -115,9 +133,9 @@ const Login = () => {
         </button>
       </form>
       <p className="text-center text-sm mt-4">
-        Don't have any account?{" "}
-        <Link className="text-blue-600 italic underline" to="/register">
-          register
+        Do you have an account?{" "}
+        <Link className="text-blue-600 italic underline" to="/login">
+          login
         </Link>
       </p>
       <Modal size="xl" show={showModal}>
@@ -141,4 +159,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Register;
