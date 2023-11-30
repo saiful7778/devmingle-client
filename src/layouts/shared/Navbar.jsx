@@ -1,11 +1,14 @@
 import { NavLink, Link } from "react-router-dom";
 import SiteLogo from "../../components/SiteLogo";
 import { IoNotifications, IoCloseCircleOutline } from "react-icons/io5";
-import { Button } from "keep-react";
+import { Avatar, Button } from "keep-react";
 import { LuMenuSquare } from "react-icons/lu";
 import { useState } from "react";
+import useAuth from "../../hooks/useAuth";
+import PropTypes from "prop-types";
 
 const Navbar = () => {
+  const { user, logout } = useAuth();
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const navLinks = (
     <>
@@ -58,7 +61,7 @@ const Navbar = () => {
               0
             </div>
           </button>
-          <UserLogout />
+          {user ? <UserLogged user={user} logout={logout} /> : <UserLogout />}
         </div>
       </nav>
       <div
@@ -87,6 +90,46 @@ const UserLogout = () => {
       Join us
     </Button>
   );
+};
+
+const UserLogged = ({ user, logout }) => {
+  const [dropdown, setDropdown] = useState(false);
+  const handleLogout = () => {
+    logout();
+  };
+  return (
+    <div className="relative">
+      <Avatar
+        className="ml-2 cursor-pointer rounded-full bg-gray-200"
+        shape="circle"
+        size="md"
+        bordered={true}
+        onClick={() => setDropdown((l) => !l)}
+        img={user?.photoURL ? user?.photoURL : ""}
+      />
+      {dropdown && (
+        <div className="absolute top-full right-0 mt-1 z-50 whitespace-nowrap p-4 space-y-2 rounded-lg bg-white">
+          <div>{user.displayName}</div>
+          <div>
+            <Link to="/dashboard">Dashboard</Link>
+          </div>
+          <Button
+            onClick={handleLogout}
+            className="btn"
+            size="xs"
+            type="primary"
+          >
+            Logout
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+UserLogged.propTypes = {
+  user: PropTypes.object,
+  logout: PropTypes.func,
 };
 
 export default Navbar;

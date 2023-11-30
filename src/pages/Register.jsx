@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Button, Modal, TextInput, Spinner } from "keep-react";
+import { TextInput, Spinner } from "keep-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import CheckError from "../components/CheckError";
@@ -12,14 +12,13 @@ import {
 import useAuth from "../hooks/useAuth";
 import axios from "axios";
 import { updateProfile } from "firebase/auth";
+import Swal from "sweetalert2";
 
 const Register = () => {
   const { register: signUp } = useAuth();
-  const [messageStatus, setMessageStatus] = useState("");
   const navigate = useNavigate();
   const [spinner, setSpinner] = useState(false);
   const [showPass, setShowPass] = useState(false);
-  const [showModal, setShowModal] = useState(false);
   const {
     register,
     handleSubmit,
@@ -31,14 +30,11 @@ const Register = () => {
     loadCaptchaEnginge(6);
   }, []);
 
-  const handleModalButton = () => {
+  const handleNavigate = () => {
     navigate("/");
-    setShowModal((l) => !l);
   };
-
-  const submitData = async (e) => {
+  const submitData = (e) => {
     setSpinner(true);
-    setMessageStatus("");
 
     const captchaCode = e.captcha;
     const userProfilePic = e.profilePic[0];
@@ -47,9 +43,11 @@ const Register = () => {
     const pass = e.password;
 
     if (validateCaptcha(captchaCode) === false) {
-      setMessageStatus("Invalid captcha");
-      setSpinner(false);
-      return setShowModal(true);
+      Swal.fire({
+        icon: "error",
+        title: "Invalide captcha",
+      });
+      return setSpinner(false);
     }
     if (userProfilePic) {
       const formData = new FormData();
@@ -67,15 +65,16 @@ const Register = () => {
               imgUrl: res.data.data.url,
             },
             setSpinner,
-            setMessageStatus,
-            setShowModal,
-            reset
+            reset,
+            handleNavigate
           );
         })
         .catch((err) => {
           console.error(err);
-          setMessageStatus(err);
-          setShowModal(true);
+          Swal.fire({
+            icon: "error",
+            text: err,
+          });
           setSpinner(false);
         });
     } else {
@@ -83,9 +82,8 @@ const Register = () => {
         signUp,
         { email, pass, userName },
         setSpinner,
-        setMessageStatus,
-        setShowModal,
-        reset
+        reset,
+        handleNavigate
       );
     }
   };
@@ -179,35 +177,11 @@ const Register = () => {
           login
         </Link>
       </p>
-      <Modal size="xl" show={showModal}>
-        <Modal.Body>
-          <div className="text-xl font-bold text-center my-10">
-            {messageStatus}
-          </div>
-        </Modal.Body>
-        <Modal.Footer className="flex justify-center">
-          <Button
-            type="primary"
-            color="error"
-            size="xs"
-            onClick={handleModalButton}
-          >
-            Close
-          </Button>
-        </Modal.Footer>
-      </Modal>
     </div>
   );
 };
 
-const UserRegister = (
-  signUp,
-  userData,
-  setSpinner,
-  setMessageStatus,
-  setShowModal,
-  reset
-) => {
+const UserRegister = (signUp, userData, setSpinner, reset, handleNavigate) => {
   signUp(userData.email, userData.pass)
     .then((result) => {
       const user = result.user;
@@ -216,26 +190,44 @@ const UserRegister = (
         photoURL: userData?.imgUrl,
       })
         .then(() => {
-          setMessageStatus(
-            `"${userData.userName}" account created successfully!`
-          );
-          setShowModal(true);
-          reset();
-          setSpinner(false);
+          Swal.fire({
+            title: `"${userData.userName}"`,
+            text: "Account created successfully!",
+            icon: "success",
+          }).then(() => {
+            handleNavigate();
+            reset();
+            setSpinner(false);
+          });
         })
         .catch((err) => {
-          console.error(err);
-          setMessageStatus(err);
-          setShowModal(true);
+          errorStatus(err);
           setSpinner(false);
         });
     })
     .catch((err) => {
-      console.error(err);
-      setMessageStatus(err);
-      setShowModal(true);
+      errorStatus(err);
       setSpinner(false);
     });
+};
+
+const errorStatus = (errorCode) => {
+  switch (errorCode.code) {
+    case "auth/email-already-in-use":
+      console.error(errorCode.code);
+      Swal.fire({
+        icon: "error",
+        text: "This email is already exist! please login",
+      });
+      break;
+    default:
+      console.error(errorCode.code);
+      Swal.fire({
+        icon: "error",
+        text: errorCode.code,
+      });
+      break;
+  }
 };
 
 export default Register;
