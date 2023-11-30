@@ -1,4 +1,5 @@
 import Swal from "sweetalert2";
+
 const errorStatus = (errorCode) => {
   switch (errorCode.code) {
     case "auth/email-already-in-use":
