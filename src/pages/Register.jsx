@@ -13,6 +13,7 @@ import useAuth from "../hooks/useAuth";
 import axios from "axios";
 import { updateProfile } from "firebase/auth";
 import Swal from "sweetalert2";
+import useAxios from "../hooks/useAxios";
 
 const Register = () => {
   const { register: signUp } = useAuth();
@@ -182,6 +183,7 @@ const Register = () => {
 };
 
 const UserRegister = (signUp, userData, setSpinner, reset, handleNavigate) => {
+  const axios = useAxios();
   signUp(userData.email, userData.pass)
     .then((result) => {
       const user = result.user;
@@ -190,15 +192,31 @@ const UserRegister = (signUp, userData, setSpinner, reset, handleNavigate) => {
         photoURL: userData?.imgUrl,
       })
         .then(() => {
-          Swal.fire({
-            title: `"${userData.userName}"`,
-            text: "Account created successfully!",
-            icon: "success",
-          }).then(() => {
-            handleNavigate();
-            reset();
-            setSpinner(false);
-          });
+          const data = {
+            userName: userData.userName,
+            userEmail: userData.email,
+            userToken: user.uid,
+            userRole: "user",
+          };
+          axios
+            .post("/user", data)
+            .then((res) => {
+              if (res.data.acknowledged) {
+                Swal.fire({
+                  title: `"${userData.userName}"`,
+                  text: "Account created successfully!",
+                  icon: "success",
+                }).then(() => {
+                  handleNavigate();
+                  reset();
+                  setSpinner(false);
+                });
+              }
+            })
+            .catch((err) => {
+              errorStatus(err);
+              setSpinner(false);
+            });
         })
         .catch((err) => {
           errorStatus(err);
@@ -221,10 +239,10 @@ const errorStatus = (errorCode) => {
       });
       break;
     default:
-      console.error(errorCode.code);
+      console.error(errorCode);
       Swal.fire({
         icon: "error",
-        text: errorCode.code,
+        text: errorCode,
       });
       break;
   }
