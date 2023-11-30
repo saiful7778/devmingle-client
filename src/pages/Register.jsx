@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button, Modal, TextInput, Spinner } from "keep-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import CheckError from "../components/CheckError";
 import { IoIosEye, IoIosEyeOff } from "react-icons/io";
@@ -9,38 +9,84 @@ import {
   LoadCanvasTemplateNoReload,
   validateCaptcha,
 } from "react-simple-captcha";
-import { Upload } from "keep-react";
+import useAuth from "../hooks/useAuth";
+import axios from "axios";
+import { updateProfile } from "firebase/auth";
 
 const Register = () => {
+  const { register: signUp } = useAuth();
   const [messageStatus, setMessageStatus] = useState("");
+  const navigate = useNavigate();
   const [spinner, setSpinner] = useState(false);
   const [showPass, setShowPass] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [fileName, setFileName] = useState("");
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      setFileName(file.name);
-    }
-  };
   const {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm();
 
   useEffect(() => {
     loadCaptchaEnginge(6);
   }, []);
 
-  const submitData = (e) => {
+  const handleModalButton = () => {
+    navigate("/");
+    setShowModal((l) => !l);
+  };
+
+  const submitData = async (e) => {
     setSpinner(true);
     setMessageStatus("");
-    console.log(e);
+
     const captchaCode = e.captcha;
+    const userProfilePic = e.profilePic[0];
+    const userName = e.fullName;
+    const email = e.email;
+    const pass = e.password;
+
     if (validateCaptcha(captchaCode) === false) {
       setMessageStatus("Invalid captcha");
+      setSpinner(false);
       return setShowModal(true);
+    }
+    if (userProfilePic) {
+      const formData = new FormData();
+      formData.set("key", import.meta.env.VITE_IMGBB_API);
+      formData.append("image", userProfilePic);
+      axios
+        .post("https://api.imgbb.com/1/upload", formData)
+        .then((res) => {
+          UserRegister(
+            signUp,
+            {
+              email,
+              pass,
+              userName,
+              imgUrl: res.data.data.url,
+            },
+            setSpinner,
+            setMessageStatus,
+            setShowModal,
+            reset
+          );
+        })
+        .catch((err) => {
+          console.error(err);
+          setMessageStatus(err);
+          setShowModal(true);
+          setSpinner(false);
+        });
+    } else {
+      UserRegister(
+        signUp,
+        { email, pass, userName },
+        setSpinner,
+        setMessageStatus,
+        setShowModal,
+        reset
+      );
     }
   };
   return (
@@ -49,12 +95,7 @@ const Register = () => {
         Register
       </h3>
       <form onSubmit={handleSubmit(submitData)} className="space-y-3">
-        <input
-          type="file"
-          onChange={handleFileChange}
-          accept="image/*"
-          {...register("profilePic")}
-        />
+        <input type="file" accept="image/*" {...register("profilePic")} />
         <TextInput
           placeholder="Full name"
           {...register("fullName", { required: true })}
@@ -140,7 +181,7 @@ const Register = () => {
       </p>
       <Modal size="xl" show={showModal}>
         <Modal.Body>
-          <div className="md:text-5xl text-3xl font-bold text-center my-10">
+          <div className="text-xl font-bold text-center my-10">
             {messageStatus}
           </div>
         </Modal.Body>
@@ -149,7 +190,7 @@ const Register = () => {
             type="primary"
             color="error"
             size="xs"
-            onClick={() => setShowModal((l) => !l)}
+            onClick={handleModalButton}
           >
             Close
           </Button>
@@ -157,6 +198,44 @@ const Register = () => {
       </Modal>
     </div>
   );
+};
+
+const UserRegister = (
+  signUp,
+  userData,
+  setSpinner,
+  setMessageStatus,
+  setShowModal,
+  reset
+) => {
+  signUp(userData.email, userData.pass)
+    .then((result) => {
+      const user = result.user;
+      updateProfile(user, {
+        displayName: userData.userName,
+        photoURL: userData?.imgUrl,
+      })
+        .then(() => {
+          setMessageStatus(
+            `"${userData.userName}" account created successfully!`
+          );
+          setShowModal(true);
+          reset();
+          setSpinner(false);
+        })
+        .catch((err) => {
+          console.error(err);
+          setMessageStatus(err);
+          setShowModal(true);
+          setSpinner(false);
+        });
+    })
+    .catch((err) => {
+      console.error(err);
+      setMessageStatus(err);
+      setShowModal(true);
+      setSpinner(false);
+    });
 };
 
 export default Register;
