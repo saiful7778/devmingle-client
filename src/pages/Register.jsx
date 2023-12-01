@@ -170,7 +170,7 @@ const Register = () => {
           className="w-full bg-blue-600 text-white rounded-md p-2 font-medium active:focus:scale-95 duration-150"
           type="submit"
         >
-          {spinner ? <Spinner color="info" size="sm" /> : "LOGIN"}
+          {spinner ? <Spinner color="info" size="sm" /> : "REGISTER"}
         </button>
       </form>
       <p className="text-center text-sm mt-4">
@@ -196,6 +196,7 @@ const UserRegister = (signUp, userData, setSpinner, reset, handleNavigate) => {
           const data = {
             userName: userData.userName,
             userEmail: userData.email,
+            userPhoto: userData?.imgUrl ? userData?.imgUrl : null,
             userToken: user.uid,
             userRole: "user",
           };
