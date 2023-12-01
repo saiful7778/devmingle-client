@@ -11,7 +11,7 @@ const DashboardLayout = () => {
     <li key={sideNav._id}>
       <NavLink
         className={({ isActive, isPending }) =>
-          (isPending ? "animate-pulse" : isActive ? "bg-gray-400" : "") +
+          (isPending ? "animate-pulse" : isActive ? "bg-gray-200" : "") +
           " capitalize py-1 px-2 rounded-md hover:bg-gray-200 w-full block"
         }
         to={sideNav.path}

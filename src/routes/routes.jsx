@@ -5,6 +5,10 @@ import Login from "../pages/Login";
 import Register from "../pages/Register";
 import ErrorPage from "../pages/ErrorPage";
 import DashboardLayout from "../layouts/DashboardLayout";
+import UserProfile from "../pages/users/UserProfile";
+import AddPost from "../pages/users/AddPost";
+import MyPost from "../pages/users/MyPost";
+import PrivateRoute from "./PrivateRoute";
 
 const route = createBrowserRouter([
   {
@@ -28,8 +32,26 @@ const route = createBrowserRouter([
   },
   {
     path: "/dashboard",
-    element: <DashboardLayout />,
+    element: (
+      <PrivateRoute>
+        <DashboardLayout />
+      </PrivateRoute>
+    ),
     errorElement: <ErrorPage />,
+    children: [
+      {
+        path: "profile",
+        element: <UserProfile />,
+      },
+      {
+        path: "add_post",
+        element: <AddPost />,
+      },
+      {
+        path: "my_post",
+        element: <MyPost />,
+      },
+    ],
   },
 ]);
 
