@@ -198,6 +198,7 @@ const UserRegister = (signUp, userData, setSpinner, reset, handleNavigate) => {
             userEmail: userData.email,
             userPhoto: userData?.imgUrl ? userData?.imgUrl : null,
             userToken: user.uid,
+            badge: "bronze",
             userRole: "user",
           };
           axios

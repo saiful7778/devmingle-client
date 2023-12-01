@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@tanstack/react-query':
+    specifier: ^5.12.0
+    version: 5.12.0(react@18.2.0)
   axios:
     specifier: ^1.6.2
     version: 1.6.2
@@ -1212,6 +1215,19 @@ packages:
   /@swc/types@0.1.5:
     resolution: {integrity: sha512-myfUej5naTBWnqOCc/MdVOLVjXUXtIA+NpDrDBKJtLLg2shUjBu3cZmB/85RyitKc55+lUUyl7oRfLOvkr2hsw==}
     dev: true
+
+  /@tanstack/query-core@5.12.0:
+    resolution: {integrity: sha512-e8v+tHu76ZYWT3i9zjYoWP2yqonKJnjoLaZGGkMs4w7D9lFJjGBHcr/+ttOX07ordyVQlxXOZ0LAmE7vxDqo5Q==}
+    dev: false
+
+  /@tanstack/react-query@5.12.0(react@18.2.0):
+    resolution: {integrity: sha512-30xBd7z8QD84sr50THKOV/OHl26X048KHe2uors9prVec5uqAaUoCu2lhHLtpddKRlLqqw63zxa12DRew0qjTw==}
+    peerDependencies:
+      react: ^18.0.0
+    dependencies:
+      '@tanstack/query-core': 5.12.0
+      react: 18.2.0
+    dev: false
 
   /@types/d3-array@3.2.1:
     resolution: {integrity: sha512-Y2Jn2idRrLzUfAKV2LyRImR+y4oa2AntrgID95SHJxuMUrkNXmanDSed71sRNZysveJVt1hLLemQZIady0FpEg==}

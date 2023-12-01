@@ -1,17 +1,13 @@
 import PropTypes from "prop-types";
 import useAuth from "../hooks/useAuth";
 import { useLocation, Navigate } from "react-router-dom";
-import { Spinner } from "keep-react";
+import Loading from "../components/Loading";
 
 const PrivateRoute = ({ children }) => {
   const location = useLocation();
   const { user, loader } = useAuth();
   if (loader) {
-    return (
-      <div className="w-full h-[50vh] flex justify-center items-center">
-        <Spinner color="info" size="xl" />
-      </div>
-    );
+    return <Loading />;
   }
   if (user) {
     return children;
