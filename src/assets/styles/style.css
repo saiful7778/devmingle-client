@@ -5,7 +5,7 @@
 @tailwind utilities;
 
 .nav-link {
-  @apply relative px-2 py-1;
+  @apply relative px-2 py-1 capitalize;
 }
 .nav-link::before {
   @apply bg-gray-800 absolute bottom-0 left-0 inline-block w-full duration-200 scale-0;

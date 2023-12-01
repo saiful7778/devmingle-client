@@ -6,36 +6,23 @@ import { LuMenuSquare } from "react-icons/lu";
 import { useState } from "react";
 import useAuth from "../../hooks/useAuth";
 import PropTypes from "prop-types";
+import { navLinks } from "../../api/staticData";
 
 const Navbar = () => {
   const { user, logout } = useAuth();
   const [showMobileMenu, setShowMobileMenu] = useState(false);
-  const navLinks = (
-    <>
-      <li>
-        <NavLink
-          className={({ isActive, isPending }) =>
-            (isPending ? "animate-pulse" : isActive ? "active" : "") +
-            " nav-link"
-          }
-          to="/"
-        >
-          Home
-        </NavLink>
-      </li>
-      <li>
-        <NavLink
-          className={({ isActive, isPending }) =>
-            (isPending ? "animate-pulse" : isActive ? "active" : "") +
-            " nav-link"
-          }
-          to="/membership"
-        >
-          Membership
-        </NavLink>
-      </li>
-    </>
-  );
+  const renderNavLinks = navLinks?.map((nav) => (
+    <li key={nav._id}>
+      <NavLink
+        className={({ isActive, isPending }) =>
+          (isPending ? "animate-pulse" : isActive ? "active" : "") + " nav-link"
+        }
+        to={nav.path}
+      >
+        {nav.navName}
+      </NavLink>
+    </li>
+  ));
   return (
     <>
       <nav className="flex items-center justify-between gap-2 py-2">
@@ -54,7 +41,7 @@ const Navbar = () => {
           </Link>
         </div>
         <div className="flex gap-2 items-center">
-          <ul className="hidden md:flex gap-2">{navLinks}</ul>
+          <ul className="hidden md:flex gap-2">{renderNavLinks}</ul>
           <button className="relative">
             <IoNotifications size="30" />
             <div className="bg-amber-500 absolute rounded-3xl flex items-center justify-center w-[30px] h-[15px] -top-px -right-3 text-body-6">
@@ -78,7 +65,7 @@ const Navbar = () => {
         >
           <IoCloseCircleOutline size={20} />
         </Button>
-        <ul className="space-y-3">{navLinks}</ul>
+        <ul className="space-y-3">{renderNavLinks}</ul>
       </div>
     </>
   );

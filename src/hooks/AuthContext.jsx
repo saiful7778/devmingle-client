@@ -36,7 +36,6 @@ const AuthContext = ({ children }) => {
       setUser(currentUser);
       const userData = { email: currentUser?.email };
       if (currentUser) {
-        console.log(currentUser.photoURL);
         axiosSecure
           .post("/jwt", userData)
           .then(({ data }) => {
