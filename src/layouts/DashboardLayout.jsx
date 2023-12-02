@@ -44,7 +44,9 @@ const DashboardLayout = () => {
         </div>
       </aside>
       <main
-        className={`${showSidebar ? "ml-40" : "ml-0"} p-2 mt-12 overflow-auto`}
+        className={`${
+          showSidebar ? "ml-40" : "ml-0"
+        } p-2 mt-14 overflow-auto bg-gray-100`}
       >
         <Outlet />
       </main>
