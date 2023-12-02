@@ -10,13 +10,13 @@ const MyPost = () => {
   const axiosSecure = useAxiosSecure();
   const { user } = useAuth();
   const {
-    data: posts,
+    data: myPost,
     isLoading,
     error,
     isError,
     refetch,
   } = useQuery({
-    queryKey: ["post"],
+    queryKey: ["mypost", user.displayName],
     queryFn: async () => {
       const res = await axiosSecure.get("/post", {
         params: { email: user.email },
@@ -31,7 +31,7 @@ const MyPost = () => {
     console.error(error);
     return "error";
   }
-  if (posts?.length === 0) {
+  if (myPost?.length === 0) {
     return (
       <>
         <Empty
@@ -45,7 +45,7 @@ const MyPost = () => {
       </>
     );
   }
-  const renderPost = posts?.map((post) => (
+  const renderPost = myPost?.map((post) => (
     <UserPost key={post._id} inputData={post} reFatch={refetch} />
   ));
   return (

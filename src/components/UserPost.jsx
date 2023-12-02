@@ -47,7 +47,7 @@ const UserPost = ({ inputData, reFatch }) => {
               reFatch();
             } else {
               Swal.fire({
-                title: "Delete in complate!",
+                title: "Delete incomplate!",
                 text: `"${title}" not deleted.`,
                 icon: "error",
               });

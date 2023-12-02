@@ -57,6 +57,7 @@ const AddPost = () => {
   ));
 
   const submitData = (e) => {
+    const postTime = new Date().getTime();
     setSpinner(true);
     const title = e.title;
     const des = e.des;
@@ -67,6 +68,7 @@ const AddPost = () => {
       title,
       des,
       tag,
+      postTime,
       author: {
         name: user.displayName,
         imgLink: user?.photoURL ? user?.photoURL : null,
