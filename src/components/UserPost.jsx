@@ -38,7 +38,7 @@ const UserPost = ({ inputData, reFatch }) => {
             params: { email: user.email, uid: user.uid },
           })
           .then(({ data }) => {
-            if (data.deletedCount === 1) {
+            if (data.result.deletedCount === 1) {
               Swal.fire({
                 title: "Deleted!",
                 text: `"${title}" has been deleted.`,
@@ -92,13 +92,13 @@ const UserPost = ({ inputData, reFatch }) => {
         </div>
       </div>
       <div>
-        <Button>
-          <BsFileArrowUpFill size={25} />
-          {upVote}
+        <Button size="sm" className="mb-1">
+          <BsFileArrowUpFill size={20} />
+          <span className="text-xl font-bold ml-1">{upVote}</span>
         </Button>
-        <Button>
-          <BsFileArrowDown size={25} />
-          {downVote}
+        <Button size="sm">
+          <BsFileArrowDown size={20} />
+          <span className="text-xl font-bold ml-1">{downVote}</span>
         </Button>
       </div>
     </div>

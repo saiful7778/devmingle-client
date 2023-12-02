@@ -81,7 +81,7 @@ const AddPost = () => {
       },
     };
     axiosSecure
-      .post(`/post/${user.uid}`, body, { params: { email: user.email } })
+      .post("/post", body, { params: { email: user.email, uid: user.uid } })
       .then(({ data }) => {
         if (data.message) {
           Swal.fire({
@@ -101,6 +101,7 @@ const AddPost = () => {
           });
         }
         reset();
+        setTag([]);
         setSpinner(false);
       })
       .catch((err) => {

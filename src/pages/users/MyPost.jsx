@@ -3,6 +3,7 @@ import useAxiosSecure from "../../hooks/useAxiosSecure";
 import useAuth from "../../hooks/useAuth";
 import Loading from "../../components/Loading";
 import UserPost from "../../components/UserPost";
+import notFoundImg from "../../assets/img/not-found.svg";
 import { Empty } from "keep-react";
 
 const MyPost = () => {
@@ -32,23 +33,16 @@ const MyPost = () => {
   }
   if (posts?.length === 0) {
     return (
-      <div className="text-center">
+      <>
         <Empty
-          title="Oops! You seem to be lost"
-          content="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry."
-          buttonText="Go To Home Page"
+          title="Oops! No post found"
+          content="Please add some post"
+          buttonText="Add new post"
           redirectBtnSize="md"
-          redirectUrl="/"
-          image={
-            <img
-              src="https://staticmania.cdn.prismic.io/staticmania/499b23f3-41ed-4bc9-a9eb-43d13779d2f8_Property+1%3DSad+screen_+Property+2%3DSm.svg"
-              height={234}
-              width={350}
-              alt="404"
-            />
-          }
+          redirectUrl="/dashboard/add_post"
+          image={<img src={notFoundImg} height={234} width={350} alt="404" />}
         />
-      </div>
+      </>
     );
   }
   const renderPost = posts?.map((post) => (

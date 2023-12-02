@@ -17,6 +17,7 @@ const postTags = [
   { _id: "pt5", tagName: "frontend" },
   { _id: "pt6", tagName: "backend" },
   { _id: "pt7", tagName: "javascript" },
+  { _id: "pt8", tagName: "mern stack" },
 ];
 
 export { navLinks, sidebarLinks, postTags };
