@@ -2,6 +2,7 @@ import { Badge, Avatar } from "keep-react";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import getPostTime from "../utility/getPostTime";
+import { BsFileArrowUpFill, BsFileArrowDown } from "react-icons/bs";
 
 const PostItem = ({ inputData }) => {
   const {
@@ -11,6 +12,7 @@ const PostItem = ({ inputData }) => {
     tag,
     postTime: loadTime,
     comment: { count },
+    voteCount: { upVote, downVote },
   } = inputData || {};
 
   const postTime = getPostTime(loadTime);
@@ -48,6 +50,28 @@ const PostItem = ({ inputData }) => {
         </div>
         <div>
           <div>Comments: {count}</div>
+          <div className="flex gap-2">
+            <Badge
+              className="select-none font-bold"
+              colorType="light"
+              color="success"
+              badgeType="outline"
+              iconPosition="left"
+              icon={<BsFileArrowUpFill size={15} />}
+            >
+              {upVote}
+            </Badge>
+            <Badge
+              className="select-none font-bold"
+              colorType="light"
+              color="info"
+              badgeType="outline"
+              iconPosition="left"
+              icon={<BsFileArrowDown size={15} />}
+            >
+              {downVote}
+            </Badge>
+          </div>
         </div>
       </div>
     </div>

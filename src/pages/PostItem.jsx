@@ -10,9 +10,18 @@ import { BsFileArrowUpFill, BsFileArrowDown } from "react-icons/bs";
 import useAuth from "../hooks/useAuth";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import CheckError from "../components/CheckError";
+import Comments from "../components/Comments";
 
 const PostItem = () => {
   const { postID } = useParams();
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm();
   const navigate = useNavigate();
   const { user } = useAuth();
   const axios = useAxios();
@@ -25,10 +34,17 @@ const PostItem = () => {
   } = useQuery({
     queryKey: ["postData", postID],
     queryFn: async () => {
-      const res = await axios.get(`/post/${postID}`);
-      return res.data;
+      const { data: postData } = await axios.get(`/post/${postID}`);
+      const { data: commentData } = await axios.get(
+        `/post/${postID}/comments`,
+        {
+          params: { title: postData?.title },
+        }
+      );
+      return { postData, commentData };
     },
   });
+
   if (isLoading) {
     return <Loading />;
   }
@@ -42,14 +58,18 @@ const PostItem = () => {
       />
     );
   }
+
   const {
-    title,
-    tag,
-    des,
-    postTime: loadTime,
-    author: { imgLink, name },
-    voteCount: { upVote, downVote },
-    comment: { count },
+    postData: {
+      title,
+      tag,
+      des,
+      postTime: loadTime,
+      author: { imgLink, name },
+      voteCount: { upVote, downVote },
+      comment: { count },
+    },
+    commentData,
   } = postData;
 
   const postTime = getPostTime(loadTime);
@@ -92,6 +112,40 @@ const PostItem = () => {
     }
   };
 
+  const submitData = (e) => {
+    if (userCond()) {
+      const commentTime = new Date().getTime();
+      const body = {
+        title,
+        postID,
+        commentTime,
+        author: {
+          name: user.displayName,
+          imgLink: user?.photoURL ? user?.photoURL : null,
+          email: user.email,
+        },
+        ...e,
+      };
+      axios
+        .post("/post/comment", body, {
+          params: { email: user.email },
+        })
+        .then(({ data }) => {
+          if (data.result.acknowledged) {
+            refetch();
+            reset();
+            Swal.fire({
+              icon: "success",
+              title: "Comment is added!",
+            });
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    }
+  };
+
   const renderTags = tag?.map((tagEle, idx) => (
     <Badge
       key={"tg" + idx}
@@ -103,8 +157,12 @@ const PostItem = () => {
       {tagEle}
     </Badge>
   ));
+  const renderComments = commentData?.map((ele) => (
+    <Comments key={ele._id} inputData={ele} />
+  ));
+
   return (
-    <div className="mt-6 space-y-2">
+    <div className="my-6 space-y-2">
       <Link to="/post">
         <Button size="xs" type="primary">
           <FaArrowLeft />
@@ -144,19 +202,26 @@ const PostItem = () => {
       <div className="flex flex-wrap gap-1 mt-1">{renderTags}</div>
       <p>{des}</p>
       <div className="text-xl font-bold">Comments: {count}</div>
-      <Textarea
-        placeholder="Leave a comment..."
-        withBg={true}
-        color="info"
-        border={true}
-        rows={4}
-      />
-      <button
-        className="w-full bg-blue-600 text-white rounded-md p-2 font-medium active:focus:scale-95 duration-150"
-        type="submit"
-      >
-        Add comment
-      </button>
+      <div className="py-3 space-y-3">{renderComments}</div>
+      <form className="space-y-3" onSubmit={handleSubmit(submitData)}>
+        <Textarea
+          placeholder="Leave a comment..."
+          withBg={true}
+          color="info"
+          border={true}
+          rows={4}
+          {...register("comment", { required: true })}
+        />
+        <CheckError error={errors} inputName="comment" fieldName="required">
+          Comment is required
+        </CheckError>
+        <button
+          className="w-full bg-blue-600 text-white rounded-md p-2 font-medium active:focus:scale-95 duration-150"
+          type="submit"
+        >
+          Add comment
+        </button>
+      </form>
     </div>
   );
 };

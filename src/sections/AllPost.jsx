@@ -3,7 +3,8 @@ import Loading from "../components/Loading";
 import PostItem from "../components/PostItem";
 import useAxios from "../hooks/useAxios";
 import { useQuery } from "@tanstack/react-query";
-import { Pagination } from "keep-react";
+import { Pagination, Empty } from "keep-react";
+import notFoundImg from "../assets/img/not-found.svg";
 
 const AllPost = () => {
   const axios = useAxios();
@@ -29,8 +30,14 @@ const AllPost = () => {
     return <Loading />;
   }
   if (isError) {
-    console.error(error);
-    return "error";
+    console.error(error.message);
+    return (
+      <Empty
+        title="Oops! No post found"
+        content="You may be in the wrong place!"
+        image={<img src={notFoundImg} height={234} width={350} alt="404" />}
+      />
+    );
   }
 
   const numberOfPage = Math.ceil(totalItems / itemsPerPage);
