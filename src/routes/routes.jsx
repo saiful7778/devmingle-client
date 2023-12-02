@@ -10,6 +10,7 @@ import AddPost from "../pages/users/AddPost";
 import MyPost from "../pages/users/MyPost";
 import PrivateRoute from "./PrivateRoute";
 import Comments from "../pages/Comments";
+import MemberShip from "../pages/MemberShip";
 
 const route = createBrowserRouter([
   {
@@ -28,6 +29,10 @@ const route = createBrowserRouter([
       {
         path: "/register",
         element: <Register />,
+      },
+      {
+        path: "/membership",
+        element: <MemberShip />,
       },
     ],
   },

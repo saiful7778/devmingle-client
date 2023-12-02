@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 const CheckError = ({ error, inputName, fieldName, children }) => {
   return (
     error[inputName]?.type === fieldName && (
-      <div className="leading-3 text-sm text-red-500">{children}</div>
+      <div className="leading-3 text-sm text-red-500 mt-1">{children}</div>
     )
   );
 };

@@ -9,4 +9,14 @@ const sidebarLinks = [
   { _id: "sd3", navName: "my post", path: "/dashboard/my_post" },
 ];
 
-export { navLinks, sidebarLinks };
+const postTags = [
+  { _id: "pt1", tagName: "react" },
+  { _id: "pt2", tagName: "node" },
+  { _id: "pt3", tagName: "express" },
+  { _id: "pt4", tagName: "mongodb" },
+  { _id: "pt5", tagName: "frontend" },
+  { _id: "pt6", tagName: "backend" },
+  { _id: "pt7", tagName: "javascript" },
+];
+
+export { navLinks, sidebarLinks, postTags };

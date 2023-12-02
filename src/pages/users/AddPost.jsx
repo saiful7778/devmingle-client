@@ -1,11 +1,15 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { TextInput, Spinner, Textarea, Dropdown } from "keep-react";
+import { useNavigate } from "react-router-dom";
+import { TextInput, Spinner, Textarea } from "keep-react";
 import CheckError from "../../components/CheckError";
 import useAuth from "../../hooks/useAuth";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
+import { postTags } from "../../api/staticData";
+import { RxCross2 } from "react-icons/rx";
+import PropTypes from "prop-types";
 import Swal from "sweetalert2";
-import { useNavigate } from "react-router-dom";
+import { Badge } from "keep-react";
 
 /**
  * Post Title
@@ -18,7 +22,7 @@ const AddPost = () => {
   const axiosSecure = useAxiosSecure();
   const navigate = useNavigate();
   const [spinner, setSpinner] = useState(false);
-  const [tag, setTag] = useState("");
+  const [tag, setTag] = useState([]);
 
   const {
     register,
@@ -27,11 +31,36 @@ const AddPost = () => {
     reset,
   } = useForm();
 
+  const handleAddTag = (currentTag) => {
+    if (!tag.includes(currentTag)) {
+      setTag([...tag, currentTag]);
+    }
+  };
+
+  const renderTags = postTags?.map((tagEle) => (
+    <Badge
+      key={tagEle._id}
+      className="capitalize select-none"
+      colorType="light"
+      color="gray"
+      badgeType="outline"
+      onClick={() => handleAddTag(tagEle.tagName)}
+    >
+      {tagEle.tagName}
+    </Badge>
+  ));
+
+  const renderSelectedTags = tag.map((ele, idx) => (
+    <TagComp key={"tg" + idx} allTags={tag} setAllTags={setTag}>
+      {ele}
+    </TagComp>
+  ));
+
   const submitData = (e) => {
     setSpinner(true);
     const title = e.title;
     const des = e.des;
-    if (!tag) {
+    if (tag.length === 0) {
       return setSpinner(false);
     }
     const body = {
@@ -46,6 +75,9 @@ const AddPost = () => {
       voteCount: {
         upVote: 0,
         downVote: 0,
+      },
+      comment: {
+        count: 0,
       },
     };
     axiosSecure
@@ -77,6 +109,7 @@ const AddPost = () => {
         setSpinner(false);
       });
   };
+
   return (
     <>
       <h4 className="text-blue-600 text-5xl font-bold text-center">
@@ -85,10 +118,7 @@ const AddPost = () => {
       <p className="text-center text-gray-500 text-sm mt-2 mb-5">
         Author image, name and email is automatically added by logged user
       </p>
-      <form
-        className="grid grid-cols-2 gap-3"
-        onSubmit={handleSubmit(submitData)}
-      >
+      <form className="space-y-3" onSubmit={handleSubmit(submitData)}>
         <div>
           <TextInput
             placeholder="Post title"
@@ -101,37 +131,18 @@ const AddPost = () => {
             Post title is required
           </CheckError>
         </div>
-        <div className="flex items-center gap-2">
-          <Dropdown
-            className="capitalize"
-            label={tag ? tag : "tag"}
-            size="sm"
-            type="default"
-            dismissOnClick={true}
-          >
-            <Dropdown.Item onClick={() => setTag("frontend")}>
-              frontend
-            </Dropdown.Item>
-            <Dropdown.Item onClick={() => setTag("backend")}>
-              backend
-            </Dropdown.Item>
-            <Dropdown.Item onClick={() => setTag("react")}>React</Dropdown.Item>
-            <Dropdown.Item onClick={() => setTag("jsx")}>JSX</Dropdown.Item>
-            <Dropdown.Item onClick={() => setTag("node")}>node</Dropdown.Item>
-            <Dropdown.Item onClick={() => setTag("express")}>
-              express
-            </Dropdown.Item>
-            <Dropdown.Item onClick={() => setTag("mongodb")}>
-              mongodb
-            </Dropdown.Item>
-          </Dropdown>
-          {!tag && (
-            <div className="leading-3 text-sm text-red-500">
-              Tag is required
-            </div>
-          )}
+        <div>
+          <div className="flex flex-wrap items-center gap-2 mt-1">
+            Tags:{renderSelectedTags}
+            {tag.length === 0 && (
+              <div className="leading-3 text-sm text-red-500">
+                Post tag is required
+              </div>
+            )}
+          </div>
+          <div className="flex flex-wrap gap-1 mt-1">{renderTags}</div>
         </div>
-        <div className="col-span-2">
+        <div>
           <Textarea
             placeholder="Description"
             withBg={true}
@@ -147,7 +158,7 @@ const AddPost = () => {
           </CheckError>
         </div>
         <button
-          className="col-span-2 bg-blue-600 text-white rounded-md p-2 font-medium active:focus:scale-95 duration-150"
+          className="w-full bg-blue-600 text-white rounded-md p-2 font-medium active:focus:scale-95 duration-150"
           type="submit"
         >
           {spinner ? <Spinner color="info" size="sm" /> : "Add post"}
@@ -155,6 +166,32 @@ const AddPost = () => {
       </form>
     </>
   );
+};
+
+const TagComp = ({ children, allTags, setAllTags }) => {
+  const handleDismiss = () => {
+    const remain = allTags.filter((ele) => ele !== children);
+    setAllTags(remain);
+  };
+  return (
+    <Badge
+      className="capitalize"
+      colorType="strong"
+      color="success"
+      badgeType="outline"
+      icon={<RxCross2 size={18} />}
+      iconPosition="right"
+      onClick={handleDismiss}
+    >
+      {children}
+    </Badge>
+  );
+};
+
+TagComp.propTypes = {
+  children: PropTypes.string,
+  allTags: PropTypes.array,
+  setAllTags: PropTypes.func,
 };
 
 export default AddPost;
