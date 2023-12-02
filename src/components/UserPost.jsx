@@ -16,7 +16,12 @@ const UserPost = ({ inputData }) => {
           {title}
         </h3>
         <div className="flex gap-2 items-center">
-          <Button size="sm" className="btn" type="primary">
+          <Button
+            href={`/dashboard/comments/${_id}`}
+            size="sm"
+            className="btn"
+            type="primary"
+          >
             Comment
           </Button>
           <Button size="sm" color="error" className="btn p-1" type="primary">

@@ -9,6 +9,7 @@ import UserProfile from "../pages/users/UserProfile";
 import AddPost from "../pages/users/AddPost";
 import MyPost from "../pages/users/MyPost";
 import PrivateRoute from "./PrivateRoute";
+import Comments from "../pages/Comments";
 
 const route = createBrowserRouter([
   {
@@ -50,6 +51,10 @@ const route = createBrowserRouter([
       {
         path: "my_post",
         element: <MyPost />,
+      },
+      {
+        path: "comments/:postId",
+        element: <Comments />,
       },
     ],
   },
