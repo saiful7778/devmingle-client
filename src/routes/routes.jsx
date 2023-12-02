@@ -11,6 +11,8 @@ import MyPost from "../pages/users/MyPost";
 import PrivateRoute from "./PrivateRoute";
 import Comments from "../pages/Comments";
 import MemberShip from "../pages/MemberShip";
+import PostItem from "../pages/PostItem";
+import AllPost from "../sections/AllPost";
 
 const route = createBrowserRouter([
   {
@@ -33,6 +35,19 @@ const route = createBrowserRouter([
       {
         path: "/membership",
         element: <MemberShip />,
+      },
+      {
+        path: "/post",
+        children: [
+          {
+            index: true,
+            element: <AllPost />,
+          },
+          {
+            path: ":postID",
+            element: <PostItem />,
+          },
+        ],
       },
     ],
   },

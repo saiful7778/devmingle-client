@@ -1,6 +1,7 @@
 import { Badge, Avatar } from "keep-react";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
+import getPostTime from "../utility/getPostTime";
 
 const PostItem = ({ inputData }) => {
   const {
@@ -57,9 +58,4 @@ PostItem.propTypes = {
   inputData: PropTypes.object,
 };
 
-const getPostTime = (inputTime) => {
-  const postTime = new Date(inputTime);
-  const options = { hour: "numeric", minute: "numeric", second: "numeric" };
-  return postTime.toLocaleTimeString("en-US", options);
-};
 export default PostItem;
