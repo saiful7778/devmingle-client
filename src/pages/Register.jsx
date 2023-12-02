@@ -200,6 +200,7 @@ const UserRegister = (signUp, userData, setSpinner, reset, handleNavigate) => {
             userToken: user.uid,
             badge: "bronze",
             userRole: "user",
+            postCount: 0,
           };
           axios
             .post("/user", data)

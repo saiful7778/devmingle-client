@@ -11,8 +11,8 @@ const DashboardLayout = () => {
     <li key={sideNav._id}>
       <NavLink
         className={({ isActive, isPending }) =>
-          (isPending ? "animate-pulse" : isActive ? "bg-gray-200" : "") +
-          " capitalize py-1 px-2 rounded-md hover:bg-gray-200 w-full block"
+          (isPending ? "animate-pulse" : isActive ? "bg-gray-100" : "") +
+          " capitalize py-1 px-2 rounded-md hover:bg-gray-100 w-full block"
         }
         to={sideNav.path}
       >
@@ -25,13 +25,13 @@ const DashboardLayout = () => {
       <aside
         className={`fixed z-40 top-0 ${
           showSidebar ? "left-0" : "right-full"
-        } h-screen p-4 w-40 bg-gray-300 border-r border-gray-400`}
+        } h-screen p-4 w-40 bg-gray-200 border-r border-gray-300`}
       >
         <Link className="pl-2 inline-block mb-2" to="/">
           <SiteLogo />
         </Link>
         <ul className="flex flex-col gap-1">{renderSidebarLinks}</ul>
-        <div className="absolute top-2 ml-2 left-full z-50">
+        <div className="absolute top-0 pl-2 left-full z-50 w-screen p-2 border border-gray-300 bg-white">
           <Button
             className="active:focus:scale-95 duration-100"
             size="xs"
@@ -43,7 +43,9 @@ const DashboardLayout = () => {
           </Button>
         </div>
       </aside>
-      <main className={`${showSidebar ? "ml-40" : "ml-0"} mt-12 p-2 w-full`}>
+      <main
+        className={`${showSidebar ? "ml-40" : "ml-0"} p-2 mt-12 overflow-auto`}
+      >
         <Outlet />
       </main>
     </div>
