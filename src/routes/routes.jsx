@@ -13,6 +13,7 @@ import Comments from "../pages/Comments";
 import MemberShip from "../pages/MemberShip";
 import PostItem from "../pages/PostItem";
 import AllpostPage from "../pages/AllpostPage";
+import AllUsers from "../pages/admin/AllUsers";
 
 const route = createBrowserRouter([
   {
@@ -75,6 +76,18 @@ const route = createBrowserRouter([
       {
         path: "comments/:postId",
         element: <Comments />,
+      },
+
+      // admin routes
+      {
+        path: "admin",
+        errorElement: <ErrorPage />,
+        children: [
+          {
+            path: "users",
+            element: <AllUsers />,
+          },
+        ],
       },
     ],
   },

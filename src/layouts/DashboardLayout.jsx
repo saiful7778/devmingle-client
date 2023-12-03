@@ -4,22 +4,18 @@ import { sidebarLinks } from "../api/staticData";
 import { Button } from "keep-react";
 import { LuMenuSquare } from "react-icons/lu";
 import { useState } from "react";
+import PropTypes from "prop-types";
 
 const DashboardLayout = () => {
   const [showSidebar, setShowSidebar] = useState(true);
-  const renderSidebarLinks = sidebarLinks?.map((sideNav) => (
-    <li key={sideNav._id}>
-      <NavLink
-        className={({ isActive, isPending }) =>
-          (isPending ? "animate-pulse" : isActive ? "bg-gray-100" : "") +
-          " capitalize py-1 px-2 rounded-md hover:bg-gray-100 w-full block"
-        }
-        to={sideNav.path}
-      >
-        {sideNav.navName}
-      </NavLink>
-    </li>
-  ));
+  const isAdmin = true;
+  const renderSidebarLinks = sidebarLinks?.map((sideNav) => {
+    if (!sideNav?.adminRoute) {
+      return <SidebarItem key={sideNav._id} inputData={sideNav} />;
+    } else if (isAdmin) {
+      return <SidebarItem key={sideNav._id} inputData={sideNav} />;
+    }
+  });
   return (
     <div className="w-full min-h-screen overflow-x-hidden text-gray-700">
       <aside
@@ -52,6 +48,26 @@ const DashboardLayout = () => {
       </main>
     </div>
   );
+};
+
+const SidebarItem = ({ inputData }) => {
+  return (
+    <li>
+      <NavLink
+        className={({ isActive, isPending }) =>
+          (isPending ? "animate-pulse" : isActive ? "bg-gray-100" : "") +
+          " capitalize py-1 px-2 rounded-md hover:bg-gray-100 w-full block border border-gray-300"
+        }
+        to={inputData.path}
+      >
+        {inputData.navName}
+      </NavLink>
+    </li>
+  );
+};
+
+SidebarItem.propTypes = {
+  inputData: PropTypes.object,
 };
 
 export default DashboardLayout;
