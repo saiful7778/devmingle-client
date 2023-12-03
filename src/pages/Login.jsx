@@ -1,14 +1,13 @@
 /* eslint-disable react/no-unescaped-entities */
-import { Spinner, TextInput } from "keep-react";
 import { useState, useRef } from "react";
+import { Spinner, TextInput } from "keep-react";
 import { useForm } from "react-hook-form";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { IoIosEye, IoIosEyeOff } from "react-icons/io";
 import CheckError from "../components/CheckError";
 import useAuth from "../hooks/useAuth";
 import errorStatus from "../utility/errorStatus";
 import Swal from "sweetalert2";
-import { useNavigate, useLocation, Link } from "react-router-dom";
-import { Helmet } from "react-helmet";
 import ReCAPTCHA from "react-google-recaptcha";
 import useAxios from "../hooks/useAxios";
 
@@ -72,9 +71,6 @@ const Login = () => {
 
   return (
     <div className="lg:w-1/2 bg-white w-full mx-auto rounded-lg shadow-md p-4">
-      <Helmet>
-        <title>Login - DevMingle</title>
-      </Helmet>
       <h3 className="text-blue-600 text-5xl font-bold text-center mb-6">
         Login
       </h3>

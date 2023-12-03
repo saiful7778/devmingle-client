@@ -5,7 +5,6 @@ import { BiRightArrowAlt } from "react-icons/bi";
 import { useState } from "react";
 import { postTags } from "../api/staticData";
 import AllPost from "../sections/AllPost";
-import { Helmet } from "react-helmet";
 
 const Home = () => {
   const [data, setData] = useState([]);
@@ -22,9 +21,6 @@ const Home = () => {
   };
   return (
     <>
-      <Helmet>
-        <title>DevMingle - A MERN stack forum</title>
-      </Helmet>
       <div
         className="w-full h-[80vh] rounded-md flex justify-center items-center p-2"
         style={{
