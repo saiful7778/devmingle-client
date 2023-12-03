@@ -45,6 +45,7 @@ const UserProfile = () => {
             className="capitalize border border-gray-300"
             size="xs"
             colorType="light"
+            color={badge === "gold" ? "warning" : "info"}
             icon={<HiOutlineBadgeCheck size={15} />}
             iconPosition="left"
           >

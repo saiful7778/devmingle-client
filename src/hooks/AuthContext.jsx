@@ -7,14 +7,14 @@ import {
 import PropTypes from "prop-types";
 import { createContext, useState, useEffect } from "react";
 import { auth } from "../firebase";
-import useAxiosSecure from "./useAxiosSecure";
+import useAxios from "./useAxios";
 
 export const AuthContextData = createContext(null);
 
 const AuthContext = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loader, setLoader] = useState(true);
-  const axiosSecure = useAxiosSecure();
+  const axios = useAxios();
 
   const register = (email, pass) => {
     setLoader(true);
@@ -36,7 +36,7 @@ const AuthContext = ({ children }) => {
       setUser(currentUser);
       const userData = { email: currentUser?.email };
       if (currentUser) {
-        axiosSecure
+        axios
           .post("/jwt", userData)
           .then(({ data }) => {
             console.log(data);
@@ -45,7 +45,7 @@ const AuthContext = ({ children }) => {
             console.error(err);
           });
       } else {
-        axiosSecure
+        axios
           .post("/jwt/logout", userData)
           .then(({ data }) => {
             console.log(data);
@@ -58,7 +58,7 @@ const AuthContext = ({ children }) => {
     return () => {
       unSubscribe();
     };
-  }, [axiosSecure]);
+  }, [axios]);
 
   const authInfo = { user, loader, register, login, logout };
 

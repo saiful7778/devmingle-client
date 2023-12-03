@@ -5,12 +5,14 @@ import { BsFileArrowUpFill, BsFileArrowDown } from "react-icons/bs";
 import Swal from "sweetalert2";
 import useAxiosSecure from "../hooks/useAxiosSecure";
 import useAuth from "../hooks/useAuth";
+import { Link } from "react-router-dom";
 
 const UserPost = ({ inputData, reFatch }) => {
   const {
     _id,
     title,
     voteCount: { upVote, downVote },
+    comment: { count },
   } = inputData;
   const axiosSecure = useAxiosSecure();
   const { user } = useAuth();
@@ -68,18 +70,18 @@ const UserPost = ({ inputData, reFatch }) => {
   return (
     <div className="flex overflow-hidden justify-between gap-2 p-2 rounded-lg border border-blue-600 bg-white">
       <div className="flex flex-col">
-        <h3 className="flex-1 leading-5 md:text-xl font-semibold capitalize max-h-16 overflow-hidden">
-          {title}
-        </h3>
+        <Link to={`/post/${_id}`}>
+          <h3 className="flex-1 leading-5 md:text-xl font-semibold capitalize hover:underline max-h-16 overflow-hidden">
+            {title}
+          </h3>
+        </Link>
+        <div className="my-2">Comments: {count}</div>
         <div className="flex gap-2 items-center">
-          <Button
-            href={`/dashboard/comments/${_id}`}
-            size="sm"
-            className="btn"
-            type="primary"
-          >
-            Comment
-          </Button>
+          <Link to={`/dashboard/comments/${_id}`}>
+            <Button size="sm" className="btn" type="primary">
+              Comment
+            </Button>
+          </Link>
           <Button
             onClick={handleDelete}
             size="sm"
