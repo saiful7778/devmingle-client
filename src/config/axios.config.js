@@ -1,8 +1,8 @@
 import axios from "axios";
 
 const axiosSecure = axios.create({
-  // baseURL: "https://devmingle.vercel.app",
-  baseURL: "http://localhost:5001",
+  baseURL: "https://devmingle.vercel.app",
+  // baseURL: "http://localhost:5001",
   withCredentials: true,
 });
 

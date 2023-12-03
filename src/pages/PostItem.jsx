@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useRef } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import useAxios from "../hooks/useAxios";
 import Loading from "../components/Loading";
@@ -38,6 +38,7 @@ const PostItem = () => {
   const changeTitle = useTitle();
   const recaptcha = useRef(null);
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
   const axios = useAxios();
   const {
@@ -100,7 +101,7 @@ const PostItem = () => {
         confirmButtonText: "login",
       }).then((result) => {
         if (result.isConfirmed) {
-          navigate("/login");
+          navigate("/login", { state: { from: location } });
         }
       });
       return false;
