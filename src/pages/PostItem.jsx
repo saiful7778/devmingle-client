@@ -5,14 +5,22 @@ import Loading from "../components/Loading";
 import { Empty, Badge, Avatar, Button, Textarea } from "keep-react";
 import notFoundImg from "../assets/img/not-found.svg";
 import getPostTime from "../utility/getPostTime";
-import { FaArrowLeft } from "react-icons/fa6";
-import { BsFileArrowUpFill, BsFileArrowDown } from "react-icons/bs";
+import {
+  BsFileArrowUpFill,
+  BsFileArrowDown,
+  BsArrowLeftShort,
+} from "react-icons/bs";
 import useAuth from "../hooks/useAuth";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import CheckError from "../components/CheckError";
 import Comments from "../components/Comments";
+import {
+  FacebookIcon,
+  FacebookShareButton,
+  FacebookShareCount,
+} from "react-share";
 
 const PostItem = () => {
   const { postID } = useParams();
@@ -71,6 +79,7 @@ const PostItem = () => {
     },
     commentData,
   } = postData;
+  const shareUrl = `${window.location.origin}/post/${postID}`;
 
   const postTime = getPostTime(loadTime);
 
@@ -165,7 +174,7 @@ const PostItem = () => {
     <div className="my-6 space-y-2">
       <Link to="/post">
         <Button size="xs" type="primary">
-          <FaArrowLeft />
+          <BsArrowLeftShort size={30} />
           <span className="ml-2">Back</span>
         </Button>
       </Link>
@@ -173,6 +182,19 @@ const PostItem = () => {
         <div>
           <h1 className="text-3xl font-bold">{title}</h1>
           <div className="font-medium text-gray-600">Created: {postTime}</div>
+          <div className="flex gap-2">
+            <div>
+              <FacebookShareButton url={shareUrl}>
+                <FacebookIcon size={32} round />
+              </FacebookShareButton>
+              <FacebookShareCount
+                url={shareUrl}
+                className="Demo__some-network__share-count"
+              >
+                {(count) => count}
+              </FacebookShareCount>
+            </div>
+          </div>
         </div>
         <div>
           <Button

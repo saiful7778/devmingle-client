@@ -41,6 +41,9 @@ dependencies:
   react-router-dom:
     specifier: ^6.20.0
     version: 6.20.0(react-dom@18.2.0)(react@18.2.0)
+  react-share:
+    specifier: ^5.0.3
+    version: 5.0.3(react@18.2.0)
   react-simple-captcha:
     specifier: ^9.3.0
     version: 9.3.0(react@18.2.0)
@@ -1725,6 +1728,17 @@ packages:
     resolution: {integrity: sha512-XRRe6Glud4rd/ZGQfiV1ruXSfbvfJedlV9Y6zOlP+2K04vBYiJEte6stfFkCP03aMnY5tsipamumUjL14fofug==}
     dev: false
 
+  /debug@2.6.9:
+    resolution: {integrity: sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA==}
+    peerDependencies:
+      supports-color: '*'
+    peerDependenciesMeta:
+      supports-color:
+        optional: true
+    dependencies:
+      ms: 2.0.0
+    dev: false
+
   /debug@4.3.4:
     resolution: {integrity: sha512-PRWFHuSU3eDtQJPvnNY7Jcket1j0t5OuOsFzPPzsekD52Zl8qUfFIPEiswXqIvHWGVHOgX+7G/vCNNhehwxfkQ==}
     engines: {node: '>=6.0'}
@@ -2728,6 +2742,14 @@ packages:
     resolution: {integrity: sha512-Bdboy+l7tA3OGW6FjyFHWkP5LuByj1Tk33Ljyq0axyzdk9//JSi2u3fP1QSmd1KNwq6VOKYGlAu87CisVir6Pw==}
     dev: true
 
+  /jsonp@0.2.1:
+    resolution: {integrity: sha512-pfog5gdDxPdV4eP7Kg87M8/bHgshlZ5pybl+yKxAnCZ5O7lCIn7Ixydj03wOlnDQesky2BPyA91SQ+5Y/mNwzw==}
+    dependencies:
+      debug: 2.6.9
+    transitivePeerDependencies:
+      - supports-color
+    dev: false
+
   /jsx-ast-utils@3.3.5:
     resolution: {integrity: sha512-ZZow9HBI5O6EPgSJLUb8n2NKgmVWTwCvHGwFuJlMjvLFqlGG6pjirPhtdsseaLZjSibD8eegzmYpUZwoIlj2cQ==}
     engines: {node: '>=4.0'}
@@ -2856,6 +2878,10 @@ packages:
 
   /moment@2.29.4:
     resolution: {integrity: sha512-5LC9SOxjSc2HF6vO2CyuTDNivEdoz2IvyJJGj6X8DJ0eFyfszE0QiEd+iXmBvUP3WHxSjFH/vIsA0EN00cgr8w==}
+    dev: false
+
+  /ms@2.0.0:
+    resolution: {integrity: sha512-Tpp60P6IUJDTuOq/5Z8cdskzJujfwqfOTkrwIwj7IRISpnkJnT6SyJ4PCPnGMoFjC9ddhal5KVIYtAt97ix05A==}
     dev: false
 
   /ms@2.1.2:
@@ -3383,6 +3409,18 @@ packages:
     dependencies:
       '@remix-run/router': 1.13.0
       react: 18.2.0
+    dev: false
+
+  /react-share@5.0.3(react@18.2.0):
+    resolution: {integrity: sha512-8BFkzfd8zNrO6JMP4Dwrt2sTSrRGQ9bNrU3K0riAwRJe4U/Z8/ryjKuhP2jLoHsfxj38MsPuyEQiVlIHVIICvw==}
+    peerDependencies:
+      react: ^17 || ^18
+    dependencies:
+      classnames: 2.3.2
+      jsonp: 0.2.1
+      react: 18.2.0
+    transitivePeerDependencies:
+      - supports-color
     dev: false
 
   /react-simple-captcha@9.3.0(react@18.2.0):
