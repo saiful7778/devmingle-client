@@ -37,7 +37,7 @@ const PostItem = ({ inputData }) => {
       >
         {title}
       </Link>
-      <div className="flex justify-between gap-2">
+      <div className="flex lg:flex-row flex-col justify-between gap-3">
         <div>
           <div className="flex gap-2 items-center">
             <Avatar shape="circle" size="sm" bordered img={imgLink} />

@@ -19,7 +19,10 @@ import Comments from "../components/Comments";
 import {
   FacebookIcon,
   FacebookShareButton,
-  FacebookShareCount,
+  TwitterShareButton,
+  XIcon,
+  FacebookMessengerIcon,
+  FacebookMessengerShareButton,
 } from "react-share";
 import ReCAPTCHA from "react-google-recaptcha";
 import useTitle from "../hooks/useTitle";
@@ -83,9 +86,10 @@ const PostItem = () => {
     },
     commentData,
   } = postData;
-  const shareUrl = `${window.location.origin}/post/${postID}`;
 
+  const shareUrl = `${window.location.origin}/post/${postID}`;
   const postTime = getPostTime(loadTime);
+  changeTitle(title);
 
   const userCond = () => {
     if (!user) {
@@ -191,8 +195,6 @@ const PostItem = () => {
     <Comments key={ele._id} inputData={ele} />
   ));
 
-  changeTitle(title);
-
   return (
     <div className="my-6 space-y-2">
       <Link to="/post">
@@ -201,30 +203,29 @@ const PostItem = () => {
           <span className="ml-2">Back</span>
         </Button>
       </Link>
-      <div className="flex justify-between">
+      <div className="flex md:flex-row flex-col justify-between py-2">
         <div>
-          <h1 className="text-3xl font-bold">{title}</h1>
+          <h1 className="md:text-4xl text-3xl font-bold">{title}</h1>
           <div className="font-medium text-gray-600">Created: {postTime}</div>
-          <div className="flex gap-2">
-            <div>
-              <FacebookShareButton url={shareUrl}>
-                <FacebookIcon size={32} round />
-              </FacebookShareButton>
-              <FacebookShareCount
-                url={shareUrl}
-                className="Demo__some-network__share-count"
-              >
-                {(count) => count}
-              </FacebookShareCount>
-            </div>
+          <div className="flex items-center gap-2 my-2">
+            <div className="text-xl font-semibold">Share: </div>
+            <FacebookShareButton url={shareUrl}>
+              <FacebookIcon size={32} round />
+            </FacebookShareButton>
+            <FacebookMessengerShareButton url={shareUrl}>
+              <FacebookMessengerIcon size={32} round />
+            </FacebookMessengerShareButton>
+            <TwitterShareButton url={shareUrl}>
+              <XIcon size={32} round />
+            </TwitterShareButton>
           </div>
         </div>
-        <div>
+        <div className="flex md:flex-col flex-row gap-2">
           <Button
             onClick={() => handleVote("up")}
             size="xs"
             type="outlinePrimary"
-            className="mb-1 active:focus:scale-95 duration-100"
+            className="active:focus:scale-95 duration-100"
           >
             <BsFileArrowUpFill size={20} />
             <span className="text-xl font-bold">{upVote}</span>

@@ -49,7 +49,9 @@ const AllPost = () => {
   return (
     <div className="my-20">
       <h2 className="text-center text-4xl font-bold mb-10">All posts</h2>
-      <div className="grid grid-cols-2 gap-3">{renderAllPosts}</div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        {renderAllPosts}
+      </div>
       <div className="flex justify-center mt-3">
         <Pagination
           currentPage={currentPage}
