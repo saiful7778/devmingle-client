@@ -1,7 +1,10 @@
 import { useRouteError, Link } from "react-router-dom";
+import useTitle from "../hooks/useTitle";
 
 const ErrorPage = () => {
   const routerError = useRouteError();
+  const changeTitle = useTitle();
+  changeTitle("404! not found - DevMingle");
   console.error(routerError);
   return (
     <div className="w-full min-h-screen flex justify-center items-center">

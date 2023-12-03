@@ -5,9 +5,11 @@ import Loading from "../../components/Loading";
 import UserPost from "../../components/UserPost";
 import notFoundImg from "../../assets/img/not-found.svg";
 import { Empty } from "keep-react";
+import useTitle from "../../hooks/useTitle";
 
 const MyPost = () => {
   const axiosSecure = useAxiosSecure();
+  const changeTitle = useTitle();
   const { user } = useAuth();
   const {
     data: myPost,
@@ -45,6 +47,7 @@ const MyPost = () => {
       </>
     );
   }
+  changeTitle("My all post - dashboard");
   const renderPost = myPost?.map((post) => (
     <UserPost key={post._id} inputData={post} reFatch={refetch} />
   ));

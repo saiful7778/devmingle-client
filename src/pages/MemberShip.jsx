@@ -1,6 +1,8 @@
-import React from "react";
+import useTitle from "../hooks/useTitle";
 
 const MemberShip = () => {
+  const changeTitle = useTitle();
+  changeTitle("MemberShip - DevMingle");
   return <div>MemberShip</div>;
 };
 

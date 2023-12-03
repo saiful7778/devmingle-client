@@ -22,6 +22,7 @@ import {
   FacebookShareCount,
 } from "react-share";
 import ReCAPTCHA from "react-google-recaptcha";
+import useTitle from "../hooks/useTitle";
 
 const PostItem = () => {
   const { postID } = useParams();
@@ -31,6 +32,7 @@ const PostItem = () => {
     reset,
     formState: { errors },
   } = useForm();
+  const changeTitle = useTitle();
   const recaptcha = useRef(null);
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -188,6 +190,8 @@ const PostItem = () => {
   const renderComments = commentData?.map((ele) => (
     <Comments key={ele._id} inputData={ele} />
   ));
+
+  changeTitle(title);
 
   return (
     <div className="my-6 space-y-2">

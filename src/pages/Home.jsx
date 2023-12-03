@@ -5,9 +5,12 @@ import { BiRightArrowAlt } from "react-icons/bi";
 import { useState } from "react";
 import { postTags } from "../api/staticData";
 import AllPost from "../sections/AllPost";
+import useTitle from "../hooks/useTitle";
 
 const Home = () => {
   const [data, setData] = useState([]);
+  const changeTitle = useTitle();
+  changeTitle();
   const handleOnChange = (event) => {
     const searchTerm = event.target.value.toLowerCase();
     const results = postTags.filter((tag) =>

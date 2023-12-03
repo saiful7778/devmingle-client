@@ -10,15 +10,11 @@ import { RxCross2 } from "react-icons/rx";
 import PropTypes from "prop-types";
 import Swal from "sweetalert2";
 import { Badge } from "keep-react";
-
-/**
- * Post Title
- * Post Description
- * Tag
- */
+import useTitle from "../../hooks/useTitle";
 
 const AddPost = () => {
   const { user } = useAuth();
+  const changeTitle = useTitle();
   const axiosSecure = useAxiosSecure();
   const navigate = useNavigate();
   const [spinner, setSpinner] = useState(false);
@@ -36,6 +32,8 @@ const AddPost = () => {
       setTag([...tag, currentTag]);
     }
   };
+
+  changeTitle("Add post - dashboard");
 
   const renderTags = postTags?.map((tagEle) => (
     <Badge

@@ -5,9 +5,11 @@ import Loading from "../../components/Loading";
 import { Avatar, Badge } from "keep-react";
 import { HiOutlineBadgeCheck } from "react-icons/hi";
 import { FaUserAstronaut } from "react-icons/fa";
+import useTitle from "../../hooks/useTitle";
 
 const UserProfile = () => {
   const { user } = useAuth();
+  const changeTitle = useTitle();
   const axiosSecure = useAxiosSecure();
   const { data, isLoading, error, isError } = useQuery({
     queryKey: ["user", user?.displayName],
@@ -26,6 +28,7 @@ const UserProfile = () => {
     return <div>error</div>;
   }
   const { badge, userEmail, userName, userPhoto, userRole } = data;
+  changeTitle("User profile - dashboard");
   return (
     <div className="flex items-center gap-4">
       <Avatar

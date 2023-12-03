@@ -10,10 +10,12 @@ import errorStatus from "../utility/errorStatus";
 import Swal from "sweetalert2";
 import ReCAPTCHA from "react-google-recaptcha";
 import useAxios from "../hooks/useAxios";
+import useTitle from "../hooks/useTitle";
 
 const Login = () => {
   const { login } = useAuth();
   const axios = useAxios();
+  const changeTitle = useTitle();
   const [spinner, setSpinner] = useState(false);
   const [showPass, setShowPass] = useState(false);
   const navigate = useNavigate();
@@ -24,6 +26,8 @@ const Login = () => {
     handleSubmit,
     formState: { errors },
   } = useForm();
+
+  changeTitle("Login - DevMingle");
 
   const submitData = (e) => {
     setSpinner(true);
@@ -50,7 +54,7 @@ const Login = () => {
                 text: "Account successfully logged in!",
               });
               setSpinner(false);
-              navigate(location.state ? location.state : "/");
+              navigate(location.state ? location.state.from.pathname : "/");
             })
             .catch((err) => {
               errorStatus(err);

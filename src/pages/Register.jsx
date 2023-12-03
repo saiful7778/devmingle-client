@@ -11,12 +11,14 @@ import Swal from "sweetalert2";
 import useAxios from "../hooks/useAxios";
 import errorStatus from "../utility/errorStatus";
 import ReCAPTCHA from "react-google-recaptcha";
+import useTitle from "../hooks/useTitle";
 
 const Register = () => {
   const { register: signUp } = useAuth();
   const siteAxios = useAxios();
   const recaptcha = useRef(null);
   const navigate = useNavigate();
+  const changeTitle = useTitle();
   const [spinner, setSpinner] = useState(false);
   const [showPass, setShowPass] = useState(false);
   const {
@@ -25,6 +27,8 @@ const Register = () => {
     formState: { errors },
     reset,
   } = useForm();
+
+  changeTitle("Register - DevMingle");
 
   const handleNavigate = () => {
     navigate("/");
