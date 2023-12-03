@@ -15,6 +15,7 @@ import { updateProfile } from "firebase/auth";
 import Swal from "sweetalert2";
 import useAxios from "../hooks/useAxios";
 import errorStatus from "../utility/errorStatus";
+import { Helmet } from "react-helmet";
 
 const Register = () => {
   const { register: signUp } = useAuth();
@@ -91,6 +92,9 @@ const Register = () => {
   };
   return (
     <div className="lg:w-1/2 bg-white w-full mx-auto rounded-lg shadow-md p-4">
+      <Helmet>
+        <title>Register - DevMingle</title>
+      </Helmet>
       <h3 className="text-blue-600 text-5xl font-bold text-center mb-6">
         Register
       </h3>

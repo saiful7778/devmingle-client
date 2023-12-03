@@ -12,7 +12,7 @@ import PrivateRoute from "./PrivateRoute";
 import Comments from "../pages/Comments";
 import MemberShip from "../pages/MemberShip";
 import PostItem from "../pages/PostItem";
-import AllPost from "../sections/AllPost";
+import AllpostPage from "../pages/AllpostPage";
 
 const route = createBrowserRouter([
   {
@@ -41,7 +41,7 @@ const route = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <AllPost />,
+            element: <AllpostPage />,
           },
           {
             path: ":postID",

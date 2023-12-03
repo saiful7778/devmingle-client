@@ -1,24 +1,24 @@
 /* eslint-disable react/no-unescaped-entities */
 import { Spinner, TextInput } from "keep-react";
-import { useEffect, useState } from "react";
+import { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { IoIosEye, IoIosEyeOff } from "react-icons/io";
-import {
-  loadCaptchaEnginge,
-  LoadCanvasTemplateNoReload,
-  validateCaptcha,
-} from "react-simple-captcha";
 import CheckError from "../components/CheckError";
 import useAuth from "../hooks/useAuth";
 import errorStatus from "../utility/errorStatus";
 import Swal from "sweetalert2";
 import { useNavigate, useLocation, Link } from "react-router-dom";
+import { Helmet } from "react-helmet";
+import ReCAPTCHA from "react-google-recaptcha";
+import useAxios from "../hooks/useAxios";
 
 const Login = () => {
   const { login } = useAuth();
+  const axios = useAxios();
   const [spinner, setSpinner] = useState(false);
   const [showPass, setShowPass] = useState(false);
   const navigate = useNavigate();
+  const recaptcha = useRef(null);
   const location = useLocation();
   const {
     register,
@@ -26,39 +26,55 @@ const Login = () => {
     formState: { errors },
   } = useForm();
 
-  useEffect(() => {
-    loadCaptchaEnginge(6);
-  }, []);
-
   const submitData = (e) => {
     setSpinner(true);
     const email = e.email;
     const pass = e.password;
-    const captchaCode = e.captcha;
-    if (validateCaptcha(captchaCode) === false) {
+
+    const captchaValue = recaptcha.current.getValue();
+    if (!captchaValue) {
       Swal.fire({
-        icon: "error",
-        title: "Invalide captcha",
+        icon: "warning",
+        text: "Please verify the reCAPTCHA!",
       });
       return setSpinner(false);
     }
-    login(email, pass)
-      .then((res) => {
-        Swal.fire({
-          icon: "success",
-          title: res.user.displayName,
-          text: "Account successfully logged in!",
-        });
-        navigate(location.state ? location.state : "/");
-        setSpinner(false);
+    axios
+      .post("/captcha/verify", { captchaValue })
+      .then(({ data }) => {
+        if (data.success) {
+          login(email, pass)
+            .then((res) => {
+              Swal.fire({
+                icon: "success",
+                title: res.user.displayName,
+                text: "Account successfully logged in!",
+              });
+              setSpinner(false);
+              navigate(location.state ? location.state : "/");
+            })
+            .catch((err) => {
+              errorStatus(err);
+              setSpinner(false);
+            });
+        } else {
+          Swal.fire({
+            icon: "error",
+            text: "Invalid reCaptcha!",
+          });
+          setSpinner(false);
+        }
       })
       .catch((err) => {
-        errorStatus(err);
-        setSpinner(false);
+        console.error(err);
       });
   };
+
   return (
     <div className="lg:w-1/2 bg-white w-full mx-auto rounded-lg shadow-md p-4">
+      <Helmet>
+        <title>Login - DevMingle</title>
+      </Helmet>
       <h3 className="text-blue-600 text-5xl font-bold text-center mb-6">
         Login
       </h3>
@@ -111,21 +127,7 @@ const Login = () => {
             </ul>
           </div>
         </CheckError>
-        <LoadCanvasTemplateNoReload />
-        <TextInput
-          placeholder="Captcha code"
-          type="text"
-          {...register("captcha", {
-            required: "captcha is required",
-            pattern: /^.{6}$/,
-          })}
-        />
-        <CheckError error={errors} inputName="captcha" fieldName="required">
-          Captcha is required
-        </CheckError>
-        <CheckError error={errors} inputName="captcha" fieldName="pattern">
-          Invalid captcha
-        </CheckError>
+        <ReCAPTCHA ref={recaptcha} sitekey={import.meta.env.VITE_SITE_KEY} />
         <button
           className="w-full bg-blue-600 text-white rounded-md p-2 font-medium active:focus:scale-95 duration-150"
           type="submit"

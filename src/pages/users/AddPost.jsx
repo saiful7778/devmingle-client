@@ -10,6 +10,7 @@ import { RxCross2 } from "react-icons/rx";
 import PropTypes from "prop-types";
 import Swal from "sweetalert2";
 import { Badge } from "keep-react";
+import { Helmet } from "react-helmet";
 
 /**
  * Post Title
@@ -115,6 +116,9 @@ const AddPost = () => {
 
   return (
     <>
+      <Helmet>
+        <title>Add new post - {user.displayName}</title>
+      </Helmet>
       <h4 className="text-blue-600 text-5xl font-bold text-center">
         Add new post
       </h4>

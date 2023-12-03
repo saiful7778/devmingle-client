@@ -5,6 +5,7 @@ import Loading from "../../components/Loading";
 import { Avatar, Badge } from "keep-react";
 import { HiOutlineBadgeCheck } from "react-icons/hi";
 import { FaUserAstronaut } from "react-icons/fa";
+import { Helmet } from "react-helmet";
 
 const UserProfile = () => {
   const { user } = useAuth();
@@ -28,6 +29,9 @@ const UserProfile = () => {
   const { badge, userEmail, userName, userPhoto, userRole } = data;
   return (
     <div className="flex items-center gap-4">
+      <Helmet>
+        <title>{user.displayName} - user profile</title>
+      </Helmet>
       <Avatar
         className="ml-2 cursor-pointer rounded-full bg-gray-200"
         shape="circle"

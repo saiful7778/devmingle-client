@@ -5,6 +5,7 @@ import Loading from "../../components/Loading";
 import UserPost from "../../components/UserPost";
 import notFoundImg from "../../assets/img/not-found.svg";
 import { Empty } from "keep-react";
+import { Helmet } from "react-helmet";
 
 const MyPost = () => {
   const axiosSecure = useAxiosSecure();
@@ -50,6 +51,9 @@ const MyPost = () => {
   ));
   return (
     <div className="bg-gray-100">
+      <Helmet>
+        <title>All my post - {user.displayName}</title>
+      </Helmet>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-2">{renderPost}</div>
     </div>
   );
