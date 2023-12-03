@@ -9,6 +9,8 @@ import { FaTrashCan } from "react-icons/fa6";
 import PropTypes from "prop-types";
 import { FaUsers, FaUserAstronaut } from "react-icons/fa";
 import Swal from "sweetalert2";
+import { useState } from "react";
+import { deleteUser } from "firebase/auth";
 
 const AllUsers = () => {
   const { user } = useAuth();
@@ -19,6 +21,7 @@ const AllUsers = () => {
     isLoading,
     isError,
     error,
+    refetch,
   } = useQuery({
     queryKey: ["allUsers"],
     queryFn: async () => {
@@ -44,7 +47,7 @@ const AllUsers = () => {
   changeTitle("All user - admin - DevMingle");
 
   const renderUsers = usersData?.map((ele, idx) => (
-    <TableRow key={ele._id} inputData={ele} count={idx + 1} />
+    <TableRow key={ele._id} inputData={ele} count={idx + 1} reFatch={refetch} />
   ));
 
   return (
@@ -89,7 +92,7 @@ const AllUsers = () => {
   );
 };
 
-const TableRow = ({ inputData, count }) => {
+const TableRow = ({ inputData, count, reFatch }) => {
   const {
     _id,
     userName,
@@ -102,6 +105,63 @@ const TableRow = ({ inputData, count }) => {
   } = inputData || {};
   const { user } = useAuth();
   const axiosSecure = useAxiosSecure();
+  const [buttonDisable, setButtonDisable] = useState(false);
+
+  const handleAdmin = () => {
+    Swal.fire({
+      icon: "info",
+      title: "Are you sure?",
+      text: `Make "${userName}" admin account.`,
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes",
+    }).then(({ isConfirmed }) => {
+      if (isConfirmed) {
+        Swal.fire({
+          title: "Loading....",
+          didOpen: () => {
+            Swal.showLoading();
+          },
+          showConfirmButton: false,
+        });
+        axiosSecure
+          .patch(
+            `/user/admin/${_id}`,
+            {},
+            {
+              params: { email: user.email, uid: userToken },
+            }
+          )
+          .then(({ data }) => {
+            if (data?.modifiedCount === 1) {
+              Swal.fire({
+                title: "Successfully!",
+                text: `"${userName}" is admin.`,
+                icon: "success",
+              });
+              setButtonDisable(true);
+              reFatch();
+            } else {
+              Swal.fire({
+                title: "Error!",
+                text: `"${userName}" is not admin.`,
+                icon: "error",
+              });
+              reFatch();
+            }
+          })
+          .catch((err) => {
+            console.error(err);
+            Swal.fire({
+              title: "Error!",
+              text: `"${userName}" is not admin.`,
+              icon: "error",
+            });
+          });
+      }
+    });
+  };
 
   const handleDelete = () => {
     Swal.fire({
@@ -121,27 +181,38 @@ const TableRow = ({ inputData, count }) => {
           },
           showConfirmButton: false,
         });
-        axiosSecure
-          .delete(`/user/${_id}`, {
-            params: { email: user.email, uid: userToken },
-          })
-          .then(({ data }) => {
-            console.log(data);
-            if (data?.deletedCount === 1) {
-              Swal.fire({
-                title: "Deleted!",
-                text: `"${userName}" has been deleted.`,
-                icon: "success",
+        deleteUser(user)
+          .then(() => {
+            axiosSecure
+              .delete(`/user/${_id}`, {
+                params: { email: user.email, uid: userToken },
+              })
+              .then(({ data }) => {
+                console.log(data);
+                if (data?.deletedCount === 1) {
+                  Swal.fire({
+                    title: "Deleted!",
+                    text: `"${userName}" has been deleted.`,
+                    icon: "success",
+                  });
+                  reFatch();
+                } else {
+                  Swal.fire({
+                    title: "Delete incomplate!",
+                    text: `"${userName}" is not deleted.`,
+                    icon: "error",
+                  });
+                  reFatch();
+                }
+              })
+              .catch((err) => {
+                console.error(err);
+                Swal.fire({
+                  title: "Delete incomplate!",
+                  text: `"${userName}" is not deleted.`,
+                  icon: "error",
+                });
               });
-              // reFatch();
-            } else {
-              Swal.fire({
-                title: "Delete incomplate!",
-                text: `"${userName}" is not deleted.`,
-                icon: "error",
-              });
-              // reFatch();
-            }
           })
           .catch((err) => {
             console.error(err);
@@ -156,10 +227,10 @@ const TableRow = ({ inputData, count }) => {
   };
   return (
     <Table.Row className="hover:bg-gray-200 even:border-gray-300 even:bg-slate-200">
-      <Table.Cell className="border-r-gray-300 py-1 p-2 text-center font-bold text-xl">
+      <Table.Cell className="border-r-gray-300 py-1 px-2 text-center font-bold text-xl">
         {count}
       </Table.Cell>
-      <Table.Cell className="border-r-gray-300 py-1 p-2">
+      <Table.Cell className="border-r-gray-300 py-1 px-2">
         <div className="flex items-center gap-2">
           <Avatar shape="circle" bordered={true} img={userPhoto} size="md" />
           <div>
@@ -170,18 +241,18 @@ const TableRow = ({ inputData, count }) => {
           </div>
         </div>
       </Table.Cell>
-      <Table.Cell className="border-r-gray-300 py-1 p-2 flex flex-col items-center">
+      <Table.Cell className="border-r-gray-300 py-1 px-2 flex flex-col items-center">
         {userRole === "user" ? (
-          <FaUsers size={25} />
+          <FaUsers size={20} />
         ) : (
-          <FaUserAstronaut size={25} />
+          <FaUserAstronaut size={20} />
         )}
         {userRole}
       </Table.Cell>
-      <Table.Cell className="border-r-gray-300 py-1 p-2">
+      <Table.Cell className="border-r-gray-300 py-1 px-2">
         {postCount}
       </Table.Cell>
-      <Table.Cell className="border-r-gray-300 py-1 p-2 capitalize">
+      <Table.Cell className="border-r-gray-300 py-1 px-2 capitalize">
         <Badge
           className="capitalize border border-gray-300"
           size="sm"
@@ -191,16 +262,27 @@ const TableRow = ({ inputData, count }) => {
           {badge}
         </Badge>
       </Table.Cell>
-      <Table.Cell className="border-r-gray-300 py-1 p-2">
-        <Button
-          onClick={handleDelete}
-          size="sm"
-          color="error"
-          className="btn py-1"
-          type="primary"
-        >
-          <FaTrashCan />
-        </Button>
+      <Table.Cell className="border-r-gray-300 py-1 px-2">
+        <div className=" flex gap-2 items-center h-full whitespace-nowrap">
+          <Button
+            onClick={handleDelete}
+            size="sm"
+            color="error"
+            className="btn py-1"
+            type="primary"
+          >
+            <FaTrashCan />
+          </Button>
+          <Button
+            type="primary"
+            color="info"
+            onClick={handleAdmin}
+            className="[&>span]:disabled:cursor-not-allowed btn"
+            disabled={buttonDisable}
+          >
+            Make admin
+          </Button>
+        </div>
       </Table.Cell>
     </Table.Row>
   );
@@ -209,6 +291,7 @@ const TableRow = ({ inputData, count }) => {
 TableRow.propTypes = {
   inputData: PropTypes.object,
   count: PropTypes.number,
+  reFatch: PropTypes.func,
 };
 
 export default AllUsers;

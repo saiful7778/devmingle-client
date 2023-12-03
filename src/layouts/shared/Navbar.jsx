@@ -73,9 +73,11 @@ const Navbar = () => {
 
 const UserLogout = () => {
   return (
-    <Button href="/login" className="ml-2 p-0 btn" size="xs" type="primary">
-      Join us
-    </Button>
+    <Link to="/login">
+      <Button className="ml-2 p-0 btn" size="xs" type="primary">
+        Join us
+      </Button>
+    </Link>
   );
 };
 
