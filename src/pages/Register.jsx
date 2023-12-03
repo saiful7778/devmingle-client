@@ -1,14 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useRef } from "react";
 import { TextInput, Spinner } from "keep-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import CheckError from "../components/CheckError";
 import { IoIosEye, IoIosEyeOff } from "react-icons/io";
-import {
-  loadCaptchaEnginge,
-  LoadCanvasTemplateNoReload,
-  validateCaptcha,
-} from "react-simple-captcha";
 import useAuth from "../hooks/useAuth";
 import axios from "axios";
 import { updateProfile } from "firebase/auth";
@@ -16,9 +11,12 @@ import Swal from "sweetalert2";
 import useAxios from "../hooks/useAxios";
 import errorStatus from "../utility/errorStatus";
 import { Helmet } from "react-helmet";
+import ReCAPTCHA from "react-google-recaptcha";
 
 const Register = () => {
   const { register: signUp } = useAuth();
+  const siteAxios = useAxios();
+  const recaptcha = useRef(null);
   const navigate = useNavigate();
   const [spinner, setSpinner] = useState(false);
   const [showPass, setShowPass] = useState(false);
@@ -29,66 +27,72 @@ const Register = () => {
     reset,
   } = useForm();
 
-  useEffect(() => {
-    loadCaptchaEnginge(6);
-  }, []);
-
   const handleNavigate = () => {
     navigate("/");
   };
   const submitData = (e) => {
     setSpinner(true);
 
-    const captchaCode = e.captcha;
     const userProfilePic = e.profilePic[0];
     const userName = e.fullName;
     const email = e.email;
     const pass = e.password;
 
-    if (validateCaptcha(captchaCode) === false) {
+    const captchaValue = recaptcha.current.getValue();
+    if (!captchaValue) {
       Swal.fire({
-        icon: "error",
-        title: "Invalide captcha",
+        icon: "warning",
+        text: "Please verify the reCAPTCHA!",
       });
       return setSpinner(false);
     }
-    if (userProfilePic) {
-      const formData = new FormData();
-      formData.set("key", import.meta.env.VITE_IMGBB_API);
-      formData.append("image", userProfilePic);
-      axios
-        .post("https://api.imgbb.com/1/upload", formData)
-        .then((res) => {
+    siteAxios.post("/captcha/verify", { captchaValue }).then(({ data }) => {
+      if (data.success) {
+        if (userProfilePic) {
+          const formData = new FormData();
+          formData.set("key", import.meta.env.VITE_IMGBB_API);
+          formData.append("image", userProfilePic);
+          axios
+            .post("https://api.imgbb.com/1/upload", formData)
+            .then((res) => {
+              UserRegister(
+                signUp,
+                {
+                  email,
+                  pass,
+                  userName,
+                  imgUrl: res.data.data.url,
+                },
+                setSpinner,
+                reset,
+                handleNavigate
+              );
+            })
+            .catch((err) => {
+              console.error(err);
+              Swal.fire({
+                icon: "error",
+                text: err,
+              });
+              setSpinner(false);
+            });
+        } else {
           UserRegister(
             signUp,
-            {
-              email,
-              pass,
-              userName,
-              imgUrl: res.data.data.url,
-            },
+            { email, pass, userName },
             setSpinner,
             reset,
             handleNavigate
           );
-        })
-        .catch((err) => {
-          console.error(err);
-          Swal.fire({
-            icon: "error",
-            text: err,
-          });
-          setSpinner(false);
+        }
+      } else {
+        Swal.fire({
+          icon: "error",
+          text: "Invalid reCaptcha!",
         });
-    } else {
-      UserRegister(
-        signUp,
-        { email, pass, userName },
-        setSpinner,
-        reset,
-        handleNavigate
-      );
-    }
+        setSpinner(false);
+      }
+    });
   };
   return (
     <div className="lg:w-1/2 bg-white w-full mx-auto rounded-lg shadow-md p-4">
@@ -155,21 +159,7 @@ const Register = () => {
             </ul>
           </div>
         </CheckError>
-        <LoadCanvasTemplateNoReload />
-        <TextInput
-          placeholder="Captcha code"
-          type="text"
-          {...register("captcha", {
-            required: "captcha is required",
-            pattern: /^.{6}$/,
-          })}
-        />
-        <CheckError error={errors} inputName="captcha" fieldName="required">
-          Captcha is required
-        </CheckError>
-        <CheckError error={errors} inputName="captcha" fieldName="pattern">
-          Invalid captcha
-        </CheckError>
+        <ReCAPTCHA ref={recaptcha} sitekey={import.meta.env.VITE_SITE_KEY} />
         <button
           className="w-full bg-blue-600 text-white rounded-md p-2 font-medium active:focus:scale-95 duration-150"
           type="submit"

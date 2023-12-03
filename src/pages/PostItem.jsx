@@ -1,5 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { useParams, Link } from "react-router-dom";
+import { useRef } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
 import useAxios from "../hooks/useAxios";
 import Loading from "../components/Loading";
 import { Empty, Badge, Avatar, Button, Textarea } from "keep-react";
@@ -12,8 +14,6 @@ import {
 } from "react-icons/bs";
 import useAuth from "../hooks/useAuth";
 import Swal from "sweetalert2";
-import { useNavigate } from "react-router-dom";
-import { useForm } from "react-hook-form";
 import CheckError from "../components/CheckError";
 import Comments from "../components/Comments";
 import {
@@ -22,6 +22,7 @@ import {
   FacebookShareCount,
 } from "react-share";
 import { Helmet } from "react-helmet";
+import ReCAPTCHA from "react-google-recaptcha";
 
 const PostItem = () => {
   const { postID } = useParams();
@@ -31,6 +32,7 @@ const PostItem = () => {
     reset,
     formState: { errors },
   } = useForm();
+  const recaptcha = useRef(null);
   const navigate = useNavigate();
   const { user } = useAuth();
   const axios = useAxios();
@@ -124,35 +126,52 @@ const PostItem = () => {
 
   const submitData = (e) => {
     if (userCond()) {
-      const commentTime = new Date().getTime();
-      const body = {
-        title,
-        postID,
-        commentTime,
-        author: {
-          name: user.displayName,
-          imgLink: user?.photoURL ? user?.photoURL : null,
-          email: user.email,
-        },
-        ...e,
-      };
-      axios
-        .post("/post/comment", body, {
-          params: { email: user.email },
-        })
-        .then(({ data }) => {
-          if (data.result.acknowledged) {
-            refetch();
-            reset();
-            Swal.fire({
-              icon: "success",
-              title: "Comment is added!",
-            });
-          }
-        })
-        .catch((err) => {
-          console.error(err);
+      const captchaValue = recaptcha.current.getValue();
+      if (!captchaValue) {
+        Swal.fire({
+          icon: "warning",
+          text: "Please verify the reCAPTCHA!",
         });
+        return;
+      }
+      axios.post("/captcha/verify", { captchaValue }).then(({ data }) => {
+        if (data.success) {
+          const commentTime = new Date().getTime();
+          const body = {
+            title,
+            postID,
+            commentTime,
+            author: {
+              name: user.displayName,
+              imgLink: user?.photoURL ? user?.photoURL : null,
+              email: user.email,
+            },
+            ...e,
+          };
+          axios
+            .post("/post/comment", body, {
+              params: { email: user.email },
+            })
+            .then(({ data }) => {
+              if (data.result.acknowledged) {
+                refetch();
+                reset();
+                Swal.fire({
+                  icon: "success",
+                  title: "Comment is added!",
+                });
+              }
+            })
+            .catch((err) => {
+              console.error(err);
+            });
+        } else {
+          Swal.fire({
+            icon: "error",
+            text: "Invalid reCaptcha!",
+          });
+        }
+      });
     }
   };
 
@@ -241,6 +260,7 @@ const PostItem = () => {
         <CheckError error={errors} inputName="comment" fieldName="required">
           Comment is required
         </CheckError>
+        <ReCAPTCHA ref={recaptcha} sitekey={import.meta.env.VITE_SITE_KEY} />
         <button
           className="w-full bg-blue-600 text-white rounded-md p-2 font-medium active:focus:scale-95 duration-150"
           type="submit"
