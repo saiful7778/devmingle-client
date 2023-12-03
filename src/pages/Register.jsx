@@ -12,6 +12,7 @@ import useAxios from "../hooks/useAxios";
 import errorStatus from "../utility/errorStatus";
 import ReCAPTCHA from "react-google-recaptcha";
 import useTitle from "../hooks/useTitle";
+import SocialAuthRegister from "../components/SocialAuthRegister";
 
 const Register = () => {
   const { register: signUp } = useAuth();
@@ -173,6 +174,7 @@ const Register = () => {
           login
         </Link>
       </p>
+      <SocialAuthRegister />
     </div>
   );
 };

@@ -11,6 +11,7 @@ import Swal from "sweetalert2";
 import ReCAPTCHA from "react-google-recaptcha";
 import useAxios from "../hooks/useAxios";
 import useTitle from "../hooks/useTitle";
+import SocialAuthLogin from "../components/SocialAuthLogin";
 
 const Login = () => {
   const { login } = useAuth();
@@ -141,6 +142,7 @@ const Login = () => {
           register
         </Link>
       </p>
+      <SocialAuthLogin />
     </div>
   );
 };
