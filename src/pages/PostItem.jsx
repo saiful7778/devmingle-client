@@ -50,14 +50,8 @@ const PostItem = () => {
   } = useQuery({
     queryKey: ["postData", postID],
     queryFn: async () => {
-      const { data: postData } = await axios.get(`/post/${postID}`);
-      const { data: commentData } = await axios.get(
-        `/post/${postID}/comments`,
-        {
-          params: { title: postData?.title },
-        }
-      );
-      return { postData, commentData };
+      const { data } = await axios.get(`/post/${postID}`);
+      return data;
     },
   });
 
@@ -74,9 +68,8 @@ const PostItem = () => {
       />
     );
   }
-
   const {
-    postData: {
+    content: {
       title,
       tag,
       des,
@@ -85,7 +78,7 @@ const PostItem = () => {
       voteCount: { upVote, downVote },
       comment: { count },
     },
-    commentData,
+    comments,
   } = postData;
 
   const shareUrl = `${window.location.origin}/post/${postID}`;
@@ -192,7 +185,7 @@ const PostItem = () => {
       {tagEle}
     </Badge>
   ));
-  const renderComments = commentData?.map((ele) => (
+  const renderComments = comments?.map((ele) => (
     <Comments key={ele._id} inputData={ele} />
   ));
 
