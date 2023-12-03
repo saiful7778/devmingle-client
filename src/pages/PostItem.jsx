@@ -21,6 +21,7 @@ import {
   FacebookShareButton,
   FacebookShareCount,
 } from "react-share";
+import { Helmet } from "react-helmet";
 
 const PostItem = () => {
   const { postID } = useParams();
@@ -172,6 +173,9 @@ const PostItem = () => {
 
   return (
     <div className="my-6 space-y-2">
+      <Helmet>
+        <title>{title}</title>
+      </Helmet>
       <Link to="/post">
         <Button size="xs" type="primary">
           <BsArrowLeftShort size={30} />
