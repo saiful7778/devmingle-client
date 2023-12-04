@@ -41,7 +41,11 @@ const route = createBrowserRouter([
       },
       {
         path: "/membership",
-        element: <MemberShip />,
+        element: (
+          <PrivateRoute>
+            <MemberShip />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/announcement",

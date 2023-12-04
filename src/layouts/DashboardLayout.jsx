@@ -16,6 +16,7 @@ const DashboardLayout = () => {
   useEffect(() => {
     if (isAdmin) {
       console.log("admin");
+      navigate("/dashboard/profile");
     } else {
       navigate("/dashboard/profile");
     }
