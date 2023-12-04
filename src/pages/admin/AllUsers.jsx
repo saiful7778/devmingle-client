@@ -3,7 +3,7 @@ import useAuth from "../../hooks/useAuth";
 import useTitle from "../../hooks/useTitle";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
 import Loading from "../../components/Loading";
-import { Avatar, Button, Empty, Table, Badge } from "keep-react";
+import { Avatar, Button, Empty, Table, Badge, Tag } from "keep-react";
 import notFoundImg from "../../assets/img/not-found.svg";
 import { FaTrashCan } from "react-icons/fa6";
 import PropTypes from "prop-types";
@@ -61,9 +61,9 @@ const AllUsers = () => {
           <p className="text-body-1 font-semibold text-metal-600">
             Total member:
           </p>
-          <Badge size="xs" colorType="light" color="info">
+          <Tag color="info" leftIcon={<FaUsers />}>
             {usersData.length} Member
-          </Badge>
+          </Tag>
         </div>
       </Table.Caption>
       <Table.Head className="bg-gray-300 border border-gray-400">

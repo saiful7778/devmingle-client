@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import useAxiosSecure from "../hooks/useAxiosSecure";
 import useAuth from "../hooks/useAuth";
 import Loading from "../components/Loading";
-import { Avatar, Button, Dropdown, Empty, Table, Modal } from "keep-react";
+import { Avatar, Button, Dropdown, Empty, Table, Modal, Tag } from "keep-react";
 import notFoundImg from "../assets/img/not-found.svg";
 import getPostTime from "../utility/getPostTime";
 import { GoCommentDiscussion } from "react-icons/go";
@@ -67,6 +67,16 @@ const Comments = () => {
       striped={true}
       hoverable={true}
     >
+      <Table.Caption>
+        <div className="flex items-center gap-5 my-5 px-6">
+          <p className="text-body-1 font-semibold text-metal-600">
+            Total Comments:
+          </p>
+          <Tag color="info" leftIcon={<GoCommentDiscussion />}>
+            {commentData.length}
+          </Tag>
+        </div>
+      </Table.Caption>
       <Table.Head className="bg-gray-300 border border-gray-400">
         <Table.HeadCell className="text-gray-500 border-r border-r-gray-400 text-lg min-w-[200px] py-1 px-2">
           User

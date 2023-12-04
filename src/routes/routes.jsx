@@ -14,6 +14,8 @@ import MemberShip from "../pages/MemberShip";
 import PostItem from "../pages/PostItem";
 import AllpostPage from "../pages/AllpostPage";
 import AllUsers from "../pages/admin/AllUsers";
+import AdminRoute from "./AdminRoute";
+import { Outlet } from "react-router-dom";
 
 const route = createBrowserRouter([
   {
@@ -82,6 +84,11 @@ const route = createBrowserRouter([
       {
         path: "admin",
         errorElement: <ErrorPage />,
+        element: (
+          <AdminRoute>
+            <Outlet />
+          </AdminRoute>
+        ),
         children: [
           {
             path: "users",
