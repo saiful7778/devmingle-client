@@ -25,7 +25,7 @@ const AllPost = () => {
         {tag}
         {`"`} post tags
       </div>
-      <div className="flex gap-2 items-center justify-center my-4">
+      <div className="flex flex-wrap gap-2 items-center justify-center my-4">
         <Button
           type="outlinePrimary"
           onClick={() => setTag("all")}

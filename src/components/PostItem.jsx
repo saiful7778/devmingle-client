@@ -39,11 +39,15 @@ const PostItem = ({ inputData }) => {
       </Link>
       <div className="flex lg:flex-row flex-col justify-between gap-3">
         <div>
-          <div className="flex gap-2 items-center">
-            <Avatar shape="circle" size="sm" bordered img={imgLink} />
-            <h6 className="text-lg font-medium">{name}</h6>
-            <div className="text-xs font-medium text-gray-600">
-              Created: {postTime}
+          <div className="flex gap-2 items-center mb-2">
+            <div className="flex-shrink-0">
+              <Avatar shape="circle" size="sm" bordered img={imgLink} />
+            </div>
+            <div>
+              <h6 className="text-lg leading-5 font-medium">{name}</h6>
+              <div className="text-xs font-medium text-gray-600">
+                Created: {postTime}
+              </div>
             </div>
           </div>
           <div className="flex flex-wrap gap-1 mt-1">{renderTags}</div>

@@ -43,15 +43,20 @@ const DashboardLayout = () => {
           <ul className="flex flex-col gap-1">{renderSidebarLinks}</ul>
         </div>
         <div className="absolute top-0 pl-2 left-full z-50 w-screen p-2 border border-gray-300 bg-white">
-          <Button
-            className="active:focus:scale-95 duration-100"
-            size="xs"
-            type="primary"
-            circle={true}
-            onClick={() => setShowSidebar((l) => !l)}
-          >
-            <LuMenuSquare size={20} />
-          </Button>
+          <div className="flex gap-2 items-center">
+            <Button
+              className="active:focus:scale-95 duration-100"
+              size="xs"
+              type="primary"
+              circle={true}
+              onClick={() => setShowSidebar((l) => !l)}
+            >
+              <LuMenuSquare size={20} />
+            </Button>
+            <Link to="/">
+              <SiteLogo />
+            </Link>
+          </div>
         </div>
       </aside>
       <main

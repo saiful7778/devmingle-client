@@ -30,7 +30,7 @@ const UserProfile = () => {
   const { badge, userEmail, userName, userPhoto, userRole } = data;
   changeTitle("User profile - dashboard");
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex sm:flex-row flex-col items-center gap-4">
       <Avatar
         className="ml-2 cursor-pointer rounded-full bg-gray-200"
         shape="circle"

@@ -2,15 +2,16 @@ import { useState } from "react";
 import useAxios from "../hooks/useAxios";
 import { FaMagnifyingGlass } from "react-icons/fa6";
 import { BiRightArrowAlt } from "react-icons/bi";
-import { SearchBar, Dropdown, Badge, Spinner } from "keep-react";
+import { SearchBar, Dropdown, Spinner } from "keep-react";
 import { Link } from "react-router-dom";
 import bannerBg from "../assets/img/banner-bg.jpg";
-import { postTags } from "../api/staticData";
-import PropTypes from "prop-types";
+// import { postTags } from "../api/staticData";
+// import PropTypes from "prop-types";
+// import { Badge } from "keep-react";
 
 const Banner = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [tags, setTags] = useState([]);
+  // const [tags, setTags] = useState([]);
   const [data, setData] = useState([]);
   const axios = useAxios();
 
@@ -28,14 +29,14 @@ const Banner = () => {
       setIsLoading(false);
     }
   };
-  const renderTags = postTags?.map((tagEle) => (
-    <SearchQuery
-      key={tagEle._id}
-      inputData={tagEle}
-      tags={tags}
-      setTags={setTags}
-    />
-  ));
+  // const renderTags = postTags?.map((tagEle) => (
+  //   <SearchQuery
+  //     key={tagEle._id}
+  //     inputData={tagEle}
+  //     tags={tags}
+  //     setTags={setTags}
+  //   />
+  // ));
   return (
     <>
       <div
@@ -54,7 +55,7 @@ const Banner = () => {
             iconPosition="right"
             handleOnChange={handleOnChange}
           >
-            <div className="flex flex-wrap gap-1 mt-1">{renderTags}</div>
+            {/* <div className="flex flex-wrap gap-1 mt-1">{renderTags}</div> */}
             <ul className="absolute top-full left-0 z-50 w-full bg-gray-200 rounded-md overflow-hidden mt-1">
               {isLoading ? (
                 <div className="flex justify-center items-center my-2">
@@ -76,42 +77,42 @@ const Banner = () => {
           </SearchBar>
         </div>
       </div>
-      <div className="capitalize my-4 text-center font-medium">
+      {/* <div className="capitalize my-4 text-center font-medium">
         {tags.join(", ")}
-      </div>
+      </div> */}
     </>
   );
 };
 
-const SearchQuery = ({ inputData, tags, setTags }) => {
-  const [isActive, setIsActive] = useState(false);
-  const handleAddTag = () => {
-    if (isActive) {
-      setIsActive((l) => !l);
-      const remain = tags.filter((ele) => ele !== inputData.tagName);
-      setTags(remain);
-    } else {
-      setIsActive((l) => !l);
-      setTags([...tags, inputData.tagName]);
-    }
-  };
-  return (
-    <Badge
-      className={`capitalize select-none ${isActive ? "bg-success-100" : ""}`}
-      colorType="strong"
-      color="success"
-      badgeType="outline"
-      onClick={handleAddTag}
-    >
-      {inputData.tagName}
-    </Badge>
-  );
-};
+// const SearchQuery = ({ inputData, tags, setTags }) => {
+//   const [isActive, setIsActive] = useState(false);
+//   const handleAddTag = () => {
+//     if (isActive) {
+//       setIsActive((l) => !l);
+//       const remain = tags.filter((ele) => ele !== inputData.tagName);
+//       setTags(remain);
+//     } else {
+//       setIsActive((l) => !l);
+//       setTags([...tags, inputData.tagName]);
+//     }
+//   };
+//   return (
+//     <Badge
+//       className={`capitalize select-none ${isActive ? "bg-success-100" : ""}`}
+//       colorType="strong"
+//       color="success"
+//       badgeType="outline"
+//       onClick={handleAddTag}
+//     >
+//       {inputData.tagName}
+//     </Badge>
+//   );
+// };
 
-SearchQuery.propTypes = {
-  inputData: PropTypes.object,
-  tags: PropTypes.array,
-  setTags: PropTypes.func,
-};
+// SearchQuery.propTypes = {
+//   inputData: PropTypes.object,
+//   tags: PropTypes.array,
+//   setTags: PropTypes.func,
+// };
 
 export default Banner;

@@ -19,7 +19,7 @@ const Comments = ({ inputData }) => {
           {name}
         </h6>
         <div className="text-sm italic text-gray-500">{commentTimeAgo}</div>
-        <p className="text-sm">{comment}</p>
+        <p className="md:text-sm text-xs">{comment}</p>
       </div>
     </div>
   );
