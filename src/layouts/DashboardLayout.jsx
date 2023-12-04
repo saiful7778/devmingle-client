@@ -1,4 +1,4 @@
-import { Link, NavLink, Outlet } from "react-router-dom";
+import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import SiteLogo from "../components/SiteLogo";
 import { sidebarLinks } from "../api/staticData";
 import { Button } from "keep-react";
@@ -6,10 +6,21 @@ import { LuMenuSquare } from "react-icons/lu";
 import { useState } from "react";
 import PropTypes from "prop-types";
 import useAdmin from "../hooks/useAdmin";
+import { useEffect } from "react";
 
 const DashboardLayout = () => {
   const [showSidebar, setShowSidebar] = useState(true);
+  const navigate = useNavigate();
   const [isAdmin] = useAdmin();
+
+  useEffect(() => {
+    if (isAdmin) {
+      console.log("admin");
+    } else {
+      navigate("/dashboard/profile");
+    }
+  }, [isAdmin, navigate]);
+
   const renderSidebarLinks = sidebarLinks?.map((sideNav) => {
     if (!sideNav?.adminRoute) {
       return <SidebarItem key={sideNav._id} inputData={sideNav} />;
@@ -17,17 +28,20 @@ const DashboardLayout = () => {
       return <SidebarItem key={sideNav._id} inputData={sideNav} />;
     }
   });
+
   return (
     <div className="w-full min-h-screen overflow-x-hidden text-gray-700">
       <aside
         className={`fixed z-40 top-0 ${
           showSidebar ? "left-0" : "right-full"
-        } h-screen p-4 w-40 bg-gray-200 border-r border-gray-300`}
+        } h-screen w-[220px] bg-gray-200 border-r border-gray-300`}
       >
-        <Link className="pl-2 inline-block mb-2" to="/">
-          <SiteLogo />
-        </Link>
-        <ul className="flex flex-col gap-1">{renderSidebarLinks}</ul>
+        <div className="h-screen p-4 w-full overflow-y-auto">
+          <Link className="pl-2 inline-block mb-2" to="/">
+            <SiteLogo />
+          </Link>
+          <ul className="flex flex-col gap-1">{renderSidebarLinks}</ul>
+        </div>
         <div className="absolute top-0 pl-2 left-full z-50 w-screen p-2 border border-gray-300 bg-white">
           <Button
             className="active:focus:scale-95 duration-100"
@@ -42,7 +56,7 @@ const DashboardLayout = () => {
       </aside>
       <main
         className={`${
-          showSidebar ? "ml-40" : "ml-0"
+          showSidebar ? "ml-[220px]" : "ml-0"
         } p-2 mt-14 overflow-auto bg-gray-100`}
       >
         <Outlet />

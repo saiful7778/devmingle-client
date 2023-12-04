@@ -21,8 +21,14 @@ const sidebarLinks = [
   },
   {
     _id: "sd6",
-    navName: "announcement",
-    path: "/dashboard/admin/announcement",
+    navName: "add announcement",
+    path: "/dashboard/admin/add_announcement",
+    adminRoute: true,
+  },
+  {
+    _id: "sd7",
+    navName: "all announcement",
+    path: "/dashboard/admin/all_announcement",
     adminRoute: true,
   },
 ];

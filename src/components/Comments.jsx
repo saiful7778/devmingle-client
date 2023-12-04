@@ -11,13 +11,15 @@ const Comments = ({ inputData }) => {
   const commentTimeAgo = moment(commentTime).fromNow();
   return (
     <div className="flex gap-2">
-      <Avatar shape="circle" size="sm" bordered img={imgLink} />
+      <div className="flex-shrink-0">
+        <Avatar shape="circle" size="sm" bordered img={imgLink} />
+      </div>
       <div>
         <h6 className="text-lg text-blue-600 leading-3 font-semibold">
           {name}
         </h6>
         <div className="text-sm italic text-gray-500">{commentTimeAgo}</div>
-        <p>{comment}</p>
+        <p className="text-sm">{comment}</p>
       </div>
     </div>
   );

@@ -17,7 +17,9 @@ import AllUsers from "../pages/admin/AllUsers";
 import AdminRoute from "./AdminRoute";
 import { Outlet } from "react-router-dom";
 import Reports from "../pages/admin/Reports";
-import Announcement from "../pages/admin/Announcement";
+import AllAnnouncement from "../pages/AllAnnouncement";
+import AddAnnouncement from "../pages/admin/Announcement";
+import ManageAnnouncement from "../pages/admin/ManageAnnouncement";
 
 const route = createBrowserRouter([
   {
@@ -40,6 +42,10 @@ const route = createBrowserRouter([
       {
         path: "/membership",
         element: <MemberShip />,
+      },
+      {
+        path: "/announcement",
+        element: <AllAnnouncement />,
       },
       {
         path: "/post",
@@ -101,8 +107,12 @@ const route = createBrowserRouter([
             element: <Reports />,
           },
           {
-            path: "announcement",
-            element: <Announcement />,
+            path: "add_announcement",
+            element: <AddAnnouncement />,
+          },
+          {
+            path: "all_announcement",
+            element: <ManageAnnouncement />,
           },
         ],
       },

@@ -6,7 +6,7 @@ import useAuth from "../../hooks/useAuth";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
 import Swal from "sweetalert2";
 
-const Announcement = () => {
+const AddAnnouncement = () => {
   const [spinner, setSpinner] = useState(false);
   const axiosSecure = useAxiosSecure();
   const { user } = useAuth();
@@ -57,7 +57,7 @@ const Announcement = () => {
   };
   return (
     <>
-      <h4 className="text-blue-600 text-5xl font-bold text-center">
+      <h4 className="text-blue-600 text-4xl md:text-5xl font-bold text-center">
         Announcement
       </h4>
       <p className="text-center text-gray-500 text-sm mt-2 mb-5">
@@ -102,4 +102,4 @@ const Announcement = () => {
   );
 };
 
-export default Announcement;
+export default AddAnnouncement;

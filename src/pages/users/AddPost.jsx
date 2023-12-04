@@ -113,7 +113,7 @@ const AddPost = () => {
 
   return (
     <>
-      <h4 className="text-blue-600 text-5xl font-bold text-center">
+      <h4 className="text-blue-600 text-4xl md:text-5xl font-bold text-center">
         Add new post
       </h4>
       <p className="text-center text-gray-500 text-sm mt-2 mb-5">

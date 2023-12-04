@@ -32,7 +32,12 @@ const MyPost = () => {
   }
   if (isError) {
     console.error(error);
-    return "error";
+    return (
+      <Empty
+        title="Oops! No post found"
+        image={<img src={notFoundImg} height={234} width={350} alt="404" />}
+      />
+    );
   }
   if (myPost?.length === 0) {
     return (

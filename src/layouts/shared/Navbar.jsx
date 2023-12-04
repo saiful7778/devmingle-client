@@ -1,15 +1,19 @@
-import { NavLink, Link } from "react-router-dom";
+import { NavLink, Link, useNavigate } from "react-router-dom";
 import SiteLogo from "../../components/SiteLogo";
 import { IoNotifications, IoCloseCircleOutline } from "react-icons/io5";
-import { Avatar, Button } from "keep-react";
+import { Avatar, Button, Popover } from "keep-react";
 import { LuMenuSquare } from "react-icons/lu";
 import { useState } from "react";
 import useAuth from "../../hooks/useAuth";
 import PropTypes from "prop-types";
 import { navLinks } from "../../api/staticData";
+import useAnnouncementCount from "../../hooks/useAnnouncementCount";
+import { Spinner } from "keep-react";
 
 const Navbar = () => {
   const { user, logout } = useAuth();
+  const [announcementCount, loading] = useAnnouncementCount();
+  const navigate = useNavigate();
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const renderNavLinks = navLinks?.map((nav) => (
     <li key={nav._id}>
@@ -42,10 +46,13 @@ const Navbar = () => {
         </div>
         <div className="flex gap-2 items-center">
           <ul className="hidden md:flex gap-2">{renderNavLinks}</ul>
-          <button className="relative">
+          <button
+            onClick={() => navigate("/announcement")}
+            className="relative"
+          >
             <IoNotifications size="30" />
             <div className="bg-amber-500 absolute rounded-3xl flex items-center justify-center w-[30px] h-[15px] -top-px -right-3 text-body-6">
-              0
+              {loading ? <Spinner size="xs" color="info" /> : announcementCount}
             </div>
           </button>
           {user ? <UserLogged user={user} logout={logout} /> : <UserLogout />}
@@ -82,22 +89,17 @@ const UserLogout = () => {
 };
 
 const UserLogged = ({ user, logout }) => {
-  const [dropdown, setDropdown] = useState(false);
   const handleLogout = () => {
     logout();
   };
   return (
-    <div className="relative">
-      <Avatar
-        className="ml-2 cursor-pointer rounded-full bg-gray-200"
-        shape="circle"
-        size="md"
-        bordered={true}
-        onClick={() => setDropdown((l) => !l)}
-        img={user?.photoURL ? user?.photoURL : ""}
-      />
-      {dropdown && (
-        <div className="absolute top-full right-0 mt-1 z-50 whitespace-nowrap p-4 space-y-2 rounded-lg bg-white">
+    <Popover
+      showDismissIcon={false}
+      showArrow={false}
+      position="bottom-end"
+      className="border border-gray-300 shadow-md whitespace-nowrap py-2 px-3 space-y-2 rounded-lg bg-white"
+      additionalContent={
+        <>
           <div>{user.displayName}</div>
           <div>
             <Link to="/dashboard">Dashboard</Link>
@@ -110,9 +112,18 @@ const UserLogged = ({ user, logout }) => {
           >
             Logout
           </Button>
-        </div>
-      )}
-    </div>
+        </>
+      }
+    >
+      <Avatar
+        className="ml-2 cursor-pointer rounded-full bg-gray-200"
+        shape="circle"
+        size="md"
+        bordered={true}
+        // onClick={() => setDropdown((l) => !l)}
+        img={user?.photoURL ? user?.photoURL : ""}
+      />
+    </Popover>
   );
 };
 
