@@ -192,7 +192,6 @@ const TableRow = ({ inputData, count, reFatch }) => {
             },
           })
           .then(({ data }) => {
-            console.log(data);
             if (data?.result?.deletedCount === 1) {
               Swal.fire({
                 title: "Deleted!",

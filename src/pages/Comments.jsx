@@ -118,8 +118,13 @@ const TableRow = ({ inputData }) => {
   const handleReport = () => {
     axiosSecure
       .post(
-        `/post//comment/${_id}/report`,
-        { feedback, postInfo: { title, postID } },
+        `/post/comment/${_id}/report`,
+        {
+          commentInfo: { comment, commentID: _id },
+          feedback,
+          postInfo: { title, postID },
+          reportUserInfo: { name: user.displayName, email: user.email },
+        },
         { params: { email: user.email } }
       )
       .then(({ data }) => {

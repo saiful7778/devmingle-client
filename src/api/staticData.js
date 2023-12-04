@@ -19,6 +19,12 @@ const sidebarLinks = [
     path: "/dashboard/admin/reports",
     adminRoute: true,
   },
+  {
+    _id: "sd6",
+    navName: "announcement",
+    path: "/dashboard/admin/announcement",
+    adminRoute: true,
+  },
 ];
 
 const postTags = [

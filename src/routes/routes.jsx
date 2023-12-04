@@ -16,6 +16,8 @@ import AllpostPage from "../pages/AllpostPage";
 import AllUsers from "../pages/admin/AllUsers";
 import AdminRoute from "./AdminRoute";
 import { Outlet } from "react-router-dom";
+import Reports from "../pages/admin/Reports";
+import Announcement from "../pages/admin/Announcement";
 
 const route = createBrowserRouter([
   {
@@ -93,6 +95,14 @@ const route = createBrowserRouter([
           {
             path: "users",
             element: <AllUsers />,
+          },
+          {
+            path: "reports",
+            element: <Reports />,
+          },
+          {
+            path: "announcement",
+            element: <Announcement />,
           },
         ],
       },

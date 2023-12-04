@@ -6,6 +6,7 @@ import UserPost from "../../components/UserPost";
 import notFoundImg from "../../assets/img/not-found.svg";
 import { Empty } from "keep-react";
 import useTitle from "../../hooks/useTitle";
+import { Tag } from "keep-react";
 
 const MyPost = () => {
   const axiosSecure = useAxiosSecure();
@@ -53,6 +54,10 @@ const MyPost = () => {
   ));
   return (
     <div className="bg-gray-100">
+      <div className="flex items-center gap-5 my-5 px-6">
+        <p className="text-body-1 font-semibold text-metal-600">Total posts:</p>
+        <Tag color="info">{myPost.length} post</Tag>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-2">{renderPost}</div>
     </div>
   );
