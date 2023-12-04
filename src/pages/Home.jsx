@@ -7,17 +7,20 @@ import { postTags } from "../api/staticData";
 import AllPost from "../sections/AllPost";
 import useTitle from "../hooks/useTitle";
 import PropTypes from "prop-types";
+import useAxios from "../hooks/useAxios";
+import { Link } from "react-router-dom";
 
 const Home = () => {
   const [tags, setTags] = useState([]);
   const [data, setData] = useState([]);
+  const axios = useAxios();
   const changeTitle = useTitle();
   changeTitle();
-  const handleOnChange = (event) => {
-    const searchTerm = event.target.value.toLowerCase();
-    const results = postTags.filter((tag) =>
-      tag.tagName.toLowerCase().includes(searchTerm)
-    );
+  const handleOnChange = async (e) => {
+    const searchTerm = e.target.value.toLowerCase();
+    const { data: results } = await axios.get("/post/all/search", {
+      params: { q: searchTerm },
+    });
     if (searchTerm === "") {
       setData([]);
     } else {
@@ -52,19 +55,23 @@ const Home = () => {
           >
             <div className="flex flex-wrap gap-1 mt-1">{renderTags}</div>
             <ul className="absolute top-full left-0 z-50 w-full bg-gray-200 rounded-md overflow-hidden mt-1">
-              {data.map((tag) => (
-                <Dropdown.Item key={tag?._id}>
-                  {tag?.tagName}
-                  <span className="ml-auto">
-                    <BiRightArrowAlt size={25} />
-                  </span>
-                </Dropdown.Item>
+              {data.slice(0, 5).map((ele) => (
+                <Link key={ele?._id} to={`/post/${ele?._id}`}>
+                  <Dropdown.Item>
+                    <span className="hover:underline">{ele?.title}</span>
+                    <span className="ml-auto">
+                      <BiRightArrowAlt size={25} />
+                    </span>
+                  </Dropdown.Item>
+                </Link>
               ))}
             </ul>
           </SearchBar>
         </div>
       </div>
-      <div className="capitalize my-4 font-medium">{tags.join(", ")}</div>
+      <div className="capitalize my-4 text-center font-medium">
+        {tags.join(", ")}
+      </div>
       <AllPost />
     </>
   );

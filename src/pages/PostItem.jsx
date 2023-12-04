@@ -192,7 +192,7 @@ const PostItem = () => {
   return (
     <div className="my-6 space-y-2">
       <Link to="/post">
-        <Button size="xs" type="primary">
+        <Button className="btn" size="xs" type="primary">
           <BsArrowLeftShort size={30} />
           <span className="ml-2">Back</span>
         </Button>
