@@ -10,7 +10,6 @@ import PropTypes from "prop-types";
 import { FaUsers, FaUserAstronaut } from "react-icons/fa";
 import Swal from "sweetalert2";
 import { useState } from "react";
-import { deleteUser } from "firebase/auth";
 
 const AllUsers = () => {
   const { user } = useAuth();
@@ -25,7 +24,7 @@ const AllUsers = () => {
   } = useQuery({
     queryKey: ["allUsers"],
     queryFn: async () => {
-      const { data } = await axiosSecure.get("/user/all", {
+      const { data } = await axiosSecure.get("/user/admin/all", {
         params: { email: user.email },
       });
       return data;
@@ -101,11 +100,13 @@ const TableRow = ({ inputData, count, reFatch }) => {
     userRole,
     postCount,
     badge,
-    userToken,
+    // userToken,
   } = inputData || {};
   const { user } = useAuth();
   const axiosSecure = useAxiosSecure();
-  const [buttonDisable, setButtonDisable] = useState(false);
+  const [buttonDisable, setButtonDisable] = useState(
+    userRole === "admin" ? true : false
+  );
 
   const handleAdmin = () => {
     Swal.fire({
@@ -127,10 +128,12 @@ const TableRow = ({ inputData, count, reFatch }) => {
         });
         axiosSecure
           .patch(
-            `/user/admin/${_id}`,
-            {},
+            `/user/admin/make_admin/${_id}`,
             {
-              params: { email: user.email, uid: userToken },
+              userEmail,
+            },
+            {
+              params: { email: user.email },
             }
           )
           .then(({ data }) => {
@@ -181,38 +184,30 @@ const TableRow = ({ inputData, count, reFatch }) => {
           },
           showConfirmButton: false,
         });
-        deleteUser(user)
-          .then(() => {
-            axiosSecure
-              .delete(`/user/${_id}`, {
-                params: { email: user.email, uid: userToken },
-              })
-              .then(({ data }) => {
-                console.log(data);
-                if (data?.deletedCount === 1) {
-                  Swal.fire({
-                    title: "Deleted!",
-                    text: `"${userName}" has been deleted.`,
-                    icon: "success",
-                  });
-                  reFatch();
-                } else {
-                  Swal.fire({
-                    title: "Delete incomplate!",
-                    text: `"${userName}" is not deleted.`,
-                    icon: "error",
-                  });
-                  reFatch();
-                }
-              })
-              .catch((err) => {
-                console.error(err);
-                Swal.fire({
-                  title: "Delete incomplate!",
-                  text: `"${userName}" is not deleted.`,
-                  icon: "error",
-                });
+        axiosSecure
+          .delete(`/user/admin/delete_account/${_id}`, {
+            params: {
+              email: user.email,
+              userEmail,
+            },
+          })
+          .then(({ data }) => {
+            console.log(data);
+            if (data?.result?.deletedCount === 1) {
+              Swal.fire({
+                title: "Deleted!",
+                text: `"${userName}" has been deleted.`,
+                icon: "success",
               });
+              reFatch();
+            } else {
+              Swal.fire({
+                title: "Delete incomplate!",
+                text: `"${userName}" is not deleted.`,
+                icon: "error",
+              });
+              reFatch();
+            }
           })
           .catch((err) => {
             console.error(err);
@@ -225,6 +220,7 @@ const TableRow = ({ inputData, count, reFatch }) => {
       }
     });
   };
+
   return (
     <Table.Row className="hover:bg-gray-200 even:border-gray-300 even:bg-slate-200">
       <Table.Cell className="border-r-gray-300 py-1 px-2 text-center font-bold text-xl">

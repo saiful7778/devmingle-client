@@ -12,6 +12,7 @@ import ReCAPTCHA from "react-google-recaptcha";
 import useAxios from "../hooks/useAxios";
 import useTitle from "../hooks/useTitle";
 import SocialAuthLogin from "../components/SocialAuthLogin";
+// import SocialAuthRegister from "../components/SocialAuthRegister";
 
 const Login = () => {
   const { login } = useAuth();

@@ -5,10 +5,11 @@ import { Button } from "keep-react";
 import { LuMenuSquare } from "react-icons/lu";
 import { useState } from "react";
 import PropTypes from "prop-types";
+import useAdmin from "../hooks/useAdmin";
 
 const DashboardLayout = () => {
   const [showSidebar, setShowSidebar] = useState(true);
-  const isAdmin = true;
+  const [isAdmin] = useAdmin();
   const renderSidebarLinks = sidebarLinks?.map((sideNav) => {
     if (!sideNav?.adminRoute) {
       return <SidebarItem key={sideNav._id} inputData={sideNav} />;
