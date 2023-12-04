@@ -6,6 +6,7 @@ import { BiRightArrowAlt } from "react-icons/bi";
 import { postTags } from "../api/staticData";
 import AllPost from "../sections/AllPost";
 import useTitle from "../hooks/useTitle";
+import PropTypes from "prop-types";
 
 const Home = () => {
   const [tags, setTags] = useState([]);
@@ -23,22 +24,13 @@ const Home = () => {
       setData(results);
     }
   };
-  const handleAddTag = (currentTag) => {
-    if (!tags.includes(currentTag)) {
-      setTags([...tags, currentTag]);
-    }
-  };
   const renderTags = postTags?.map((tagEle) => (
-    <Badge
+    <SearchQuery
       key={tagEle._id}
-      className="capitalize select-none"
-      colorType="light"
-      color="info"
-      badgeType="outline"
-      onClick={() => handleAddTag(tagEle.tagName)}
-    >
-      {tagEle.tagName}
-    </Badge>
+      inputData={tagEle}
+      tags={tags}
+      setTags={setTags}
+    />
   ));
   return (
     <>
@@ -72,9 +64,41 @@ const Home = () => {
           </SearchBar>
         </div>
       </div>
+      <div className="capitalize my-4 font-medium">{tags.join(", ")}</div>
       <AllPost />
     </>
   );
+};
+
+const SearchQuery = ({ inputData, tags, setTags }) => {
+  const [isActive, setIsActive] = useState(false);
+  const handleAddTag = () => {
+    if (isActive) {
+      setIsActive((l) => !l);
+      const remain = tags.filter((ele) => ele !== inputData.tagName);
+      setTags(remain);
+    } else {
+      setIsActive((l) => !l);
+      setTags([...tags, inputData.tagName]);
+    }
+  };
+  return (
+    <Badge
+      className={`capitalize select-none ${isActive ? "bg-success-100" : ""}`}
+      colorType="strong"
+      color="success"
+      badgeType="outline"
+      onClick={handleAddTag}
+    >
+      {inputData.tagName}
+    </Badge>
+  );
+};
+
+SearchQuery.propTypes = {
+  inputData: PropTypes.object,
+  tags: PropTypes.array,
+  setTags: PropTypes.func,
 };
 
 export default Home;

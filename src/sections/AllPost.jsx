@@ -1,68 +1,69 @@
 import { useState } from "react";
-import Loading from "../components/Loading";
-import PostItem from "../components/PostItem";
-import useAxios from "../hooks/useAxios";
-import { useQuery } from "@tanstack/react-query";
-import { Pagination, Empty } from "keep-react";
-import notFoundImg from "../assets/img/not-found.svg";
+import { Button } from "keep-react";
+import { postTags } from "../api/staticData";
+import PropTypes from "prop-types";
+import AllPostComp from "./AllPostComp";
 
 const AllPost = () => {
-  const axios = useAxios();
-  const [totalItems, setTotalItems] = useState(0);
+  const [tag, setTag] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
-  const {
-    data: posts,
-    isLoading,
-    isError,
-    error,
-  } = useQuery({
-    queryKey: ["posts", { currentPage, itemsPerPage }],
-    queryFn: async () => {
-      const res = await axios.get("/post/all", {
-        params: { page: currentPage - 1, size: itemsPerPage },
-      });
-      setTotalItems(res.data.count);
-      return res.data;
-    },
-  });
-  if (isLoading) {
-    return <Loading />;
-  }
-  if (isError) {
-    console.error(error.message);
-    return (
-      <Empty
-        title="Oops! No post found"
-        content="You may be in the wrong place!"
-        image={<img src={notFoundImg} height={234} width={350} alt="404" />}
-      />
-    );
-  }
 
-  const numberOfPage = Math.ceil(totalItems / itemsPerPage);
-
-  const renderAllPosts = posts?.result?.map((post) => (
-    <PostItem key={post._id} inputData={post} />
+  const renderTabButtons = postTags?.map((tab) => (
+    <TabButton
+      key={"tb" + tab._id}
+      inputData={tab}
+      setTag={setTag}
+      setCurrentPage={setCurrentPage}
+    />
   ));
 
   return (
     <div className="my-20">
-      <h2 className="text-center text-4xl font-bold mb-10">All posts</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        {renderAllPosts}
+      <h2 className="text-center text-4xl font-bold my-5">All posts</h2>
+      <div className="text-center font-medium">
+        Result of {`"`}
+        {tag}
+        {`"`} post tags
       </div>
-      <div className="flex justify-center mt-3">
-        <Pagination
-          currentPage={currentPage}
-          onPageChange={setCurrentPage}
-          totalPages={numberOfPage}
-          iconWithOutText={true}
-          prevNextShape="roundSquare"
-        />
+      <div className="flex gap-2 items-center justify-center my-4">
+        <Button
+          type="outlinePrimary"
+          onClick={() => setTag("all")}
+          className="btn capitalize"
+        >
+          all
+        </Button>
+        {renderTabButtons}
       </div>
+      <AllPostComp
+        tag={tag}
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
+      />
     </div>
   );
+};
+
+const TabButton = ({ inputData, setTag, setCurrentPage }) => {
+  const handleAddTag = () => {
+    setTag(inputData.tagName);
+    setCurrentPage(1);
+  };
+  return (
+    <Button
+      type="outlinePrimary"
+      onClick={handleAddTag}
+      className="btn capitalize"
+    >
+      {inputData.tagName}
+    </Button>
+  );
+};
+
+TabButton.propTypes = {
+  inputData: PropTypes.object,
+  setTag: PropTypes.func,
+  setCurrentPage: PropTypes.func,
 };
 
 export default AllPost;
