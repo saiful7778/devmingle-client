@@ -39,7 +39,7 @@ const SinglePost = () => {
   const recaptcha = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, userData } = useAuth();
+  const { user, userData, token } = useAuth();
   const axios = useAxios();
   const {
     data: postData,
@@ -97,16 +97,25 @@ const SinglePost = () => {
       const isUserLogged = await userCondition();
 
       if (isUserLogged) {
-        const body =
-          vote === "up"
-            ? { upVote: parseInt(upVote + 1), downVote }
-            : { downVote: parseInt(downVote + 1), upVote };
+        const voteKey =
+          vote === "up" ? "upVote" : vote === "down" && "downVote";
+        const voteValue =
+          voteKey === "upVote" ? upVote : voteKey === "downVote" && downVote;
 
-        const { data } = await axios.patch(`/post/${postID}`, body, {
-          params: { email: user.email },
-        });
+        const { data } = await axios.patch(
+          `/post/update/${postID}`,
+          {
+            voteCount: {
+              [voteKey]: parseInt(voteValue) + 1,
+            },
+          },
+          {
+            params: { email: user.email, userId: userData._id },
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
 
-        if (data.modifiedCount) {
+        if (data?.data?.modifiedCount) {
           refetch();
         }
       }
@@ -143,7 +152,10 @@ const SinglePost = () => {
         const { data: commentData } = await axios.post(
           `/post/comment/${postID}`,
           { details: e.comment },
-          { params: { email: user.email, userId: userData._id } }
+          {
+            params: { email: user.email, userId: userData._id },
+            headers: { Authorization: `Bearer ${token}` },
+          }
         );
         if (!commentData.success) {
           Swal.fire({
