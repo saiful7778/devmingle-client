@@ -4,7 +4,7 @@ import { IoNotifications, IoCloseCircleOutline } from "react-icons/io5";
 import { Avatar, Button, Popover } from "keep-react";
 import { LuMenuSquare } from "react-icons/lu";
 import { useState } from "react";
-import useAuth from "../../hooks/useAuth";
+import useAuth from "@/hooks/useAuth";
 import PropTypes from "prop-types";
 import { navLinks } from "../../api/staticData";
 import { Spinner } from "keep-react";
