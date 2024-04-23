@@ -15,6 +15,8 @@ export const AuthContextData = createContext(null);
 
 const AuthContext = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
+  const [userData, setUserData] = useState(null);
   const [loader, setLoader] = useState(true);
   const axios = useAxios();
 
@@ -39,39 +41,43 @@ const AuthContext = ({ children }) => {
 
   useEffect(() => {
     const unSubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setLoader(false);
-
       setUser(currentUser);
-      const userData = { email: currentUser?.email };
+      const userData = { userEmail: currentUser?.email };
       if (currentUser) {
         axios
-          .post("/jwt", userData)
+          .post("/authentication/login", userData)
           .then(({ data }) => {
-            console.log(data);
+            setUserData(data.userData);
+            setToken(data.token);
           })
           .catch((err) => {
             console.error(err);
           });
       } else {
-        axios
-          .post("/jwt/logout", userData)
-          .then(({ data }) => {
-            console.log(data);
-          })
-          .catch((err) => {
-            console.error(err);
-          });
+        setUserData(null);
+        setToken(null);
       }
+      setLoader(false);
     });
+
     return () => {
       unSubscribe();
     };
   }, [axios]);
 
-  const authInfo = { user, loader, register, login, googleAuth, logout };
-
   return (
-    <AuthContextData.Provider value={authInfo}>
+    <AuthContextData.Provider
+      value={{
+        user,
+        loader,
+        register,
+        login,
+        googleAuth,
+        logout,
+        token,
+        userData,
+      }}
+    >
       {children}
     </AuthContextData.Provider>
   );
