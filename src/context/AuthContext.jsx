@@ -1,3 +1,6 @@
+import { createContext, useEffect, useState } from "react";
+import PropTypes from "prop-types";
+import useAxios from "@/hooks/useAxios";
 import {
   GoogleAuthProvider,
   createUserWithEmailAndPassword,
@@ -6,14 +9,11 @@ import {
   signInWithPopup,
   signOut,
 } from "firebase/auth";
-import PropTypes from "prop-types";
-import { createContext, useState, useEffect } from "react";
-import { auth } from "../firebase";
-import useAxios from "./useAxios";
+import { auth } from "@/firebase";
 
-export const AuthContextData = createContext(null);
+export const AuthContext = createContext(null);
 
-const AuthContext = ({ children }) => {
+const AuthContextProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
   const [userData, setUserData] = useState(null);
@@ -64,9 +64,8 @@ const AuthContext = ({ children }) => {
       unSubscribe();
     };
   }, [axios]);
-
   return (
-    <AuthContextData.Provider
+    <AuthContext.Provider
       value={{
         user,
         loader,
@@ -79,10 +78,12 @@ const AuthContext = ({ children }) => {
       }}
     >
       {children}
-    </AuthContextData.Provider>
+    </AuthContext.Provider>
   );
 };
-AuthContext.propTypes = {
+
+AuthContextProvider.propTypes = {
   children: PropTypes.node,
 };
-export default AuthContext;
+
+export default AuthContextProvider;

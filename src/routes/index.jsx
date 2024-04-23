@@ -118,11 +118,9 @@ const route = createBrowserRouter([
         path: "admin",
         errorElement: <ErrorPage />,
         element: (
-          <SuspenseProvider>
-            <AdminRoute>
-              <Outlet />
-            </AdminRoute>
-          </SuspenseProvider>
+          <AdminRoute>
+            <Outlet />
+          </AdminRoute>
         ),
         children: [
           {
