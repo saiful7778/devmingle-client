@@ -11,24 +11,37 @@ import bannerBg from "../assets/img/banner-bg.jpg";
 
 const Banner = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(false);
   // const [tags, setTags] = useState([]);
   const [data, setData] = useState([]);
   const axios = useAxios();
 
   const handleOnChange = async (e) => {
     const searchTerm = e.target.value.toLowerCase();
-    setIsLoading(true);
-    const { data: results } = await axios.get("/post/all/search", {
-      params: { q: searchTerm },
-    });
-    if (searchTerm === "") {
-      setData([]);
-      setIsLoading(false);
-    } else {
-      setData(results);
+    const controller = new AbortController();
+    try {
+      setIsLoading(true);
+      setError(false);
+      const { data: results } = await axios.get("/posts/search", {
+        params: { q: searchTerm },
+        signal: controller.signal,
+      });
+      if (!results.success) {
+        setError("Something went wrong");
+        setIsLoading(false);
+      }
+      if (searchTerm === "") {
+        setData([]);
+      } else {
+        setData(results.data);
+      }
+    } catch {
+      setError(true);
+    } finally {
       setIsLoading(false);
     }
   };
+
   // const renderTags = postTags?.map((tagEle) => (
   //   <SearchQuery
   //     key={tagEle._id}
@@ -61,9 +74,13 @@ const Banner = () => {
                 <div className="flex justify-center items-center my-2">
                   <Spinner color="info" size="xl" />
                 </div>
+              ) : error ? (
+                <div className="p-2 text-center text-red-600">
+                  Something went wrong
+                </div>
               ) : (
-                data.map((ele) => (
-                  <Link key={ele?._id} to={`/post/${ele?._id}`}>
+                data?.map((ele, idx) => (
+                  <Link key={"search_item" + idx} to={`/post/${ele?.id}`}>
                     <Dropdown.Item>
                       <span className="hover:underline">{ele?.title}</span>
                       <span className="ml-auto">
