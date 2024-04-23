@@ -1,25 +1,39 @@
-import { createBrowserRouter } from "react-router-dom";
-import MainLayout from "../layouts/MainLayout";
-import Home from "../pages/public/Home";
-import Login from "../pages/Login";
-import Register from "../pages/Register";
-import ErrorPage from "../pages/ErrorPage";
-import DashboardLayout from "../layouts/DashboardLayout";
-import UserProfile from "../pages/users/UserProfile";
-import AddPost from "../pages/users/AddPost";
-import MyPost from "../pages/users/MyPost";
-import PrivateRoute from "./PrivateRoute";
-import Comments from "../pages/Comments";
-import MemberShip from "../pages/MemberShip";
-import PostItem from "../pages/PostItem";
-import AllpostPage from "../pages/AllpostPage";
-import AllUsers from "../pages/admin/AllUsers";
+import { createBrowserRouter, Outlet } from "react-router-dom";
+import { lazy } from "react";
+
+// layouts
+import MainLayout from "@/layouts/MainLayout";
+const DashboardLayout = lazy(() => import("@/layouts/DashboardLayout"));
+
+// public pages
+import Home from "@/pages/public/Home";
+import AllAnnouncement from "@/pages/public/AllAnnouncement";
+
+// authentication pages
+import Login from "@/pages/auth/Login";
+import Register from "@/pages/auth/Register";
+import AllpostPage from "@/pages/public/AllpostPage";
+
+// admin pages
+const AllUsers = lazy(() => import("@/pages/admin/AllUsers"));
+const Reports = lazy(() => import("@/pages/admin/Reports"));
+const AddAnnouncement = lazy(() => import("@/pages/admin/Announcement"));
+const ManageAnnouncement = lazy(() =>
+  import("@/pages/admin/ManageAnnouncement")
+);
+
+// user pages
+const UserProfile = lazy(() => import("@/pages/users/UserProfile"));
+const AddPost = lazy(() => import("@/pages/users/AddPost"));
+const MyPost = lazy(() => import("@/pages/users/MyPost"));
+const Comments = lazy(() => import("@/pages/users/Comments"));
+const PostItem = lazy(() => import("@/pages/users/PostItem"));
+const MemberShip = lazy(() => import("@/pages/users/MemberShip"));
+
+// routes
 import AdminRoute from "./AdminRoute";
-import { Outlet } from "react-router-dom";
-import Reports from "../pages/admin/Reports";
-import AllAnnouncement from "../pages/AllAnnouncement";
-import AddAnnouncement from "../pages/admin/Announcement";
-import ManageAnnouncement from "../pages/admin/ManageAnnouncement";
+import PrivateRoute from "./PrivateRoute";
+import ErrorPage from "@/pages/ErrorPage";
 
 const route = createBrowserRouter([
   {

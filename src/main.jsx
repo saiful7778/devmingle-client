@@ -1,9 +1,9 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import "./assets/styles/style.css";
+import "@/assets/styles/style.css";
 import { RouterProvider } from "react-router-dom";
-import route from "./routes/routes";
-import AuthContext from "./hooks/AuthContext";
+import route from "@/routes";
+import AuthContext from "@/hooks/AuthContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient();

@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { Button, Card, Modal } from "keep-react";
-import useTitle from "../hooks/useTitle";
+import useTitle from "../../hooks/useTitle";
 import { FaRegCircleCheck } from "react-icons/fa6";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
-import PaymentForm from "../components/PaymentForm";
+import PaymentForm from "../../components/PaymentForm";
 import { MdOutlinePayment } from "react-icons/md";
-import useAuth from "../hooks/useAuth";
-import useAxiosSecure from "../hooks/useAxiosSecure";
+import useAuth from "../../hooks/useAuth";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 const MemberShip = () => {
   const { user } = useAuth();

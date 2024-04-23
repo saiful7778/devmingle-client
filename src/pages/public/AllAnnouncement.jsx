@@ -1,8 +1,8 @@
 import { Avatar, Empty } from "keep-react";
 import PropTypes from "prop-types";
-import useAxios from "../hooks/useAxios";
+import useAxios from "../../hooks/useAxios";
 import { useQuery } from "@tanstack/react-query";
-import Loading from "../components/Loading";
+import Loading from "../../components/Loading";
 import notFoundImg from "../assets/img/not-found.svg";
 
 const AllAnnouncement = () => {

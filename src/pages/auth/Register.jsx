@@ -2,17 +2,17 @@ import { useState, useRef } from "react";
 import { TextInput, Spinner } from "keep-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import CheckError from "../components/CheckError";
+import CheckError from "../../components/CheckError";
 import { IoIosEye, IoIosEyeOff } from "react-icons/io";
-import useAuth from "../hooks/useAuth";
+import useAuth from "../../hooks/useAuth";
 import axios from "axios";
 import { updateProfile } from "firebase/auth";
 import Swal from "sweetalert2";
-import useAxios from "../hooks/useAxios";
-import errorStatus from "../utility/errorStatus";
+import useAxios from "../../hooks/useAxios";
+import errorStatus from "../../utility/errorStatus";
 import ReCAPTCHA from "react-google-recaptcha";
-import useTitle from "../hooks/useTitle";
-import SocialAuthRegister from "../components/SocialAuthRegister";
+import useTitle from "../../hooks/useTitle";
+import SocialAuthRegister from "../../components/SocialAuthRegister";
 
 const Register = () => {
   const { register: signUp } = useAuth();

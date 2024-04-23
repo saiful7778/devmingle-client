@@ -2,20 +2,20 @@ import { useQuery } from "@tanstack/react-query";
 import { useRef } from "react";
 import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import useAxios from "../hooks/useAxios";
-import Loading from "../components/Loading";
+import useAxios from "../../hooks/useAxios";
+import Loading from "../../components/Loading";
 import { Empty, Badge, Avatar, Button, Textarea } from "keep-react";
 import notFoundImg from "../assets/img/not-found.svg";
-import getPostTime from "../utility/getPostTime";
+import getPostTime from "../../utility/getPostTime";
 import {
   BsFileArrowUpFill,
   BsFileArrowDown,
   BsArrowLeftShort,
 } from "react-icons/bs";
-import useAuth from "../hooks/useAuth";
+import useAuth from "../../hooks/useAuth";
 import Swal from "sweetalert2";
-import CheckError from "../components/CheckError";
-import Comments from "../components/Comments";
+import CheckError from "../../components/CheckError";
+import Comments from "../../components/Comments";
 import {
   FacebookIcon,
   FacebookShareButton,
@@ -25,7 +25,7 @@ import {
   FacebookMessengerShareButton,
 } from "react-share";
 import ReCAPTCHA from "react-google-recaptcha";
-import useTitle from "../hooks/useTitle";
+import useTitle from "../../hooks/useTitle";
 
 const PostItem = () => {
   const { postID } = useParams();

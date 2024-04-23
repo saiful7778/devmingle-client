@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
-import useTitle from "../hooks/useTitle";
+import useTitle from "../../hooks/useTitle";
 import { useQuery } from "@tanstack/react-query";
-import useAxiosSecure from "../hooks/useAxiosSecure";
-import useAuth from "../hooks/useAuth";
-import Loading from "../components/Loading";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
+import useAuth from "../../hooks/useAuth";
+import Loading from "../../components/Loading";
 import { Avatar, Button, Dropdown, Empty, Table, Modal, Tag } from "keep-react";
 import notFoundImg from "../assets/img/not-found.svg";
-import getPostTime from "../utility/getPostTime";
+import getPostTime from "../../utility/getPostTime";
 import { GoCommentDiscussion } from "react-icons/go";
 import PropTypes from "prop-types";
 import Swal from "sweetalert2";

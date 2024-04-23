@@ -1,5 +1,5 @@
-import useTitle from "../hooks/useTitle";
-import AllPost from "../sections/AllPost";
+import useTitle from "../../hooks/useTitle";
+import AllPost from "../../sections/AllPost";
 
 const AllpostPage = () => {
   const changeTitle = useTitle();

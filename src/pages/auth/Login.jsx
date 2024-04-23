@@ -4,14 +4,14 @@ import { Spinner, TextInput } from "keep-react";
 import { useForm } from "react-hook-form";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { IoIosEye, IoIosEyeOff } from "react-icons/io";
-import CheckError from "../components/CheckError";
-import useAuth from "../hooks/useAuth";
-import errorStatus from "../utility/errorStatus";
+import CheckError from "../../components/CheckError";
+import useAuth from "../../hooks/useAuth";
+import errorStatus from "../../utility/errorStatus";
 import Swal from "sweetalert2";
 import ReCAPTCHA from "react-google-recaptcha";
-import useAxios from "../hooks/useAxios";
-import useTitle from "../hooks/useTitle";
-import SocialAuthLogin from "../components/SocialAuthLogin";
+import useAxios from "../../hooks/useAxios";
+import useTitle from "../../hooks/useTitle";
+import SocialAuthLogin from "../../components/SocialAuthLogin";
 // import SocialAuthRegister from "../components/SocialAuthRegister";
 
 const Login = () => {
