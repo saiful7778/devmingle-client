@@ -27,7 +27,7 @@ import ReCAPTCHA from "react-google-recaptcha";
 import useTitle from "@/hooks/useTitle";
 import ErrorDataShow from "@/components/ErrorDataShow";
 
-const PostItem = () => {
+const SinglePost = () => {
   const { postID } = useParams();
   const {
     register,
@@ -39,7 +39,7 @@ const PostItem = () => {
   const recaptcha = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useAuth();
+  const { user, userData } = useAuth();
   const axios = useAxios();
   const {
     data: postData,
@@ -65,7 +65,7 @@ const PostItem = () => {
     title,
     tags,
     des,
-    createAt,
+    createdAt,
     author: { userName, userImage },
     voteCount: { upVote, downVote },
     commentCount,
@@ -73,94 +73,96 @@ const PostItem = () => {
   } = postData.data;
 
   const shareUrl = `${window.location.origin}/post/${postID}`;
-  const postTime = getPostTime(createAt);
+  const postTime = getPostTime(createdAt);
   changeTitle(title);
 
-  const userCond = () => {
+  const userCondition = async () => {
     if (!user) {
-      Swal.fire({
+      const { isConfirmed } = await Swal.fire({
         icon: "warning",
         title: "Warning",
         text: "You need to login/register for do this!",
         confirmButtonText: "login",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          navigate("/login", { state: { from: location } });
-        }
       });
+      if (isConfirmed) {
+        navigate("/login", { state: { from: location } });
+      }
       return false;
     }
     return true;
   };
 
-  const handleVote = (vote) => {
-    if (userCond()) {
-      const body =
-        vote === "up"
-          ? { upVote: parseInt(upVote + 1), downVote }
-          : { downVote: parseInt(downVote + 1), upVote };
-      axios
-        .patch(`/post/${postID}`, body, {
+  const handleVote = async (vote) => {
+    try {
+      const isUserLogged = await userCondition();
+
+      if (isUserLogged) {
+        const body =
+          vote === "up"
+            ? { upVote: parseInt(upVote + 1), downVote }
+            : { downVote: parseInt(downVote + 1), upVote };
+
+        const { data } = await axios.patch(`/post/${postID}`, body, {
           params: { email: user.email },
-        })
-        .then(({ data }) => {
-          if (data.modifiedCount) {
-            refetch();
-          }
-        })
-        .catch((err) => {
-          console.error(err);
         });
+
+        if (data.modifiedCount) {
+          refetch();
+        }
+      }
+    } catch (err) {
+      Swal.fire({
+        icon: "error",
+        text: err,
+      });
     }
   };
 
-  const submitData = (e) => {
-    if (userCond()) {
-      const captchaValue = recaptcha.current.getValue();
-      if (!captchaValue) {
-        Swal.fire({
-          icon: "warning",
-          text: "Please verify the reCAPTCHA!",
+  const submitData = async (e) => {
+    try {
+      const isUserLogged = await userCondition();
+      if (isUserLogged) {
+        const captchaValue = recaptcha.current.getValue();
+        if (!captchaValue) {
+          Swal.fire({
+            icon: "warning",
+            text: "Please verify the reCAPTCHA!",
+          });
+          return;
+        }
+        const { data: reCaptcha } = await axios.post("/captcha/verify", {
+          captchaValue,
         });
-        return;
-      }
-      axios.post("/captcha/verify", { captchaValue }).then(({ data }) => {
-        if (data.success) {
-          const commentTime = new Date().getTime();
-          const body = {
-            title,
-            postID,
-            commentTime,
-            author: {
-              name: user.displayName,
-              imgLink: user?.photoURL ? user?.photoURL : null,
-              email: user.email,
-            },
-            ...e,
-          };
-          axios
-            .post("/post/comment", body, {
-              params: { email: user.email },
-            })
-            .then(({ data }) => {
-              if (data.result.acknowledged) {
-                refetch();
-                reset();
-                Swal.fire({
-                  icon: "success",
-                  title: "Comment is added!",
-                });
-              }
-            })
-            .catch((err) => {
-              console.error(err);
-            });
-        } else {
+        if (!reCaptcha.success) {
           Swal.fire({
             icon: "error",
             text: "Invalid reCaptcha!",
           });
+          return;
         }
+        const { data: commentData } = await axios.post(
+          `/post/comment/${postID}`,
+          { details: e.comment },
+          { params: { email: user.email, userId: userData._id } }
+        );
+        if (!commentData.success) {
+          Swal.fire({
+            icon: "error",
+            text: "Comment doesn't create",
+          });
+          return;
+        }
+        refetch();
+        reset();
+        Swal.fire({
+          icon: "success",
+          title: "Comment is added!",
+        });
+      }
+    } catch (err) {
+      Swal.fire({
+        icon: "error",
+        text: err,
       });
     }
   };
@@ -259,4 +261,4 @@ const PostItem = () => {
   );
 };
 
-export default PostItem;
+export default SinglePost;

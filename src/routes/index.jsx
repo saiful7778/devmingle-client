@@ -8,7 +8,7 @@ const DashboardLayout = lazy(() => import("@/layouts/DashboardLayout"));
 // public pages
 import Home from "@/pages/public/Home";
 import AllAnnouncement from "@/pages/public/AllAnnouncement";
-const PostItem = lazy(() => import("@/pages/PostItem"));
+const SinglePost = lazy(() => import("@/pages/public/SinglePost"));
 
 // authentication pages
 import Login from "@/pages/auth/Login";
@@ -77,7 +77,7 @@ const route = createBrowserRouter([
             path: ":postID",
             element: (
               <SuspenseProvider>
-                <PostItem />
+                <SinglePost />
               </SuspenseProvider>
             ),
           },

@@ -4,11 +4,7 @@ import AllPost from "../../sections/AllPost";
 const AllpostPage = () => {
   const changeTitle = useTitle();
   changeTitle("All post - DevMingle");
-  return (
-    <>
-      <AllPost />
-    </>
-  );
+  return <AllPost />;
 };
 
 export default AllpostPage;
