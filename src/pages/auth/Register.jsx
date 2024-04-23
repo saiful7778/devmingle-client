@@ -100,7 +100,7 @@ const Register = () => {
   };
 
   return (
-    <div className="lg:w-1/2 bg-white w-full mx-auto rounded-lg shadow-md p-4">
+    <>
       <h3 className="text-blue-600 text-5xl font-bold text-center mb-6">
         Register
       </h3>
@@ -176,7 +176,7 @@ const Register = () => {
         </Link>
       </p>
       <SocialAuthRegister />
-    </div>
+    </>
   );
 };
 

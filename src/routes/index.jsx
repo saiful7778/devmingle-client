@@ -33,6 +33,7 @@ const MemberShip = lazy(() => import("@/pages/users/MemberShip"));
 // routes
 import AdminRoute from "./AdminRoute";
 import PrivateRoute from "./PrivateRoute";
+import AuthRoute from "./AuthRoute";
 import ErrorPage from "@/pages/ErrorPage";
 import SuspenseProvider from "@/context/SuspenseContext";
 
@@ -48,11 +49,19 @@ const route = createBrowserRouter([
       },
       {
         path: "/login",
-        element: <Login />,
+        element: (
+          <AuthRoute>
+            <Login />
+          </AuthRoute>
+        ),
       },
       {
         path: "/register",
-        element: <Register />,
+        element: (
+          <AuthRoute>
+            <Register />
+          </AuthRoute>
+        ),
       },
       {
         path: "/membership",
