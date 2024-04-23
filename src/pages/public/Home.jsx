@@ -1,6 +1,6 @@
-import AllPost from "../../sections/AllPost";
-import useTitle from "../../hooks/useTitle";
-import Banner from "../../sections/Banner";
+import AllPost from "@/sections/AllPost";
+import useTitle from "@/hooks/useTitle";
+import Banner from "@/sections/Banner";
 
 const Home = () => {
   const changeTitle = useTitle();
@@ -9,7 +9,7 @@ const Home = () => {
   return (
     <>
       <Banner />
-      {/* <AllPost /> */}
+      <AllPost />
     </>
   );
 };

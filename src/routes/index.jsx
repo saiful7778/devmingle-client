@@ -8,6 +8,7 @@ const DashboardLayout = lazy(() => import("@/layouts/DashboardLayout"));
 // public pages
 import Home from "@/pages/public/Home";
 import AllAnnouncement from "@/pages/public/AllAnnouncement";
+const PostItem = lazy(() => import("@/pages/PostItem"));
 
 // authentication pages
 import Login from "@/pages/auth/Login";
@@ -27,13 +28,13 @@ const UserProfile = lazy(() => import("@/pages/users/UserProfile"));
 const AddPost = lazy(() => import("@/pages/users/AddPost"));
 const MyPost = lazy(() => import("@/pages/users/MyPost"));
 const Comments = lazy(() => import("@/pages/users/Comments"));
-const PostItem = lazy(() => import("@/pages/users/PostItem"));
 const MemberShip = lazy(() => import("@/pages/users/MemberShip"));
 
 // routes
 import AdminRoute from "./AdminRoute";
 import PrivateRoute from "./PrivateRoute";
 import ErrorPage from "@/pages/ErrorPage";
+import SuspenseProvider from "@/components/SuspenseProvider";
 
 const route = createBrowserRouter([
   {
@@ -74,7 +75,11 @@ const route = createBrowserRouter([
           },
           {
             path: ":postID",
-            element: <PostItem />,
+            element: (
+              <SuspenseProvider>
+                <PostItem />
+              </SuspenseProvider>
+            ),
           },
         ],
       },
@@ -83,9 +88,11 @@ const route = createBrowserRouter([
   {
     path: "/dashboard",
     element: (
-      <PrivateRoute>
-        <DashboardLayout />
-      </PrivateRoute>
+      <SuspenseProvider>
+        <PrivateRoute>
+          <DashboardLayout />
+        </PrivateRoute>
+      </SuspenseProvider>
     ),
     errorElement: <ErrorPage />,
     children: [
@@ -111,9 +118,11 @@ const route = createBrowserRouter([
         path: "admin",
         errorElement: <ErrorPage />,
         element: (
-          <AdminRoute>
-            <Outlet />
-          </AdminRoute>
+          <SuspenseProvider>
+            <AdminRoute>
+              <Outlet />
+            </AdminRoute>
+          </SuspenseProvider>
         ),
         children: [
           {

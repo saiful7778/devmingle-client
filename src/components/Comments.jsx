@@ -4,22 +4,22 @@ import moment from "moment";
 
 const Comments = ({ inputData }) => {
   const {
-    author: { name, imgLink },
-    comment,
-    commentTime,
+    user: { userName, userImage },
+    details,
+    createdAt,
   } = inputData || {};
-  const commentTimeAgo = moment(commentTime).fromNow();
+  const commentTimeAgo = moment(createdAt).fromNow();
   return (
     <div className="flex gap-2">
       <div className="flex-shrink-0">
-        <Avatar shape="circle" size="sm" bordered img={imgLink} />
+        <Avatar shape="circle" size="sm" bordered img={userImage} />
       </div>
       <div>
         <h6 className="text-lg text-blue-600 leading-3 font-semibold">
-          {name}
+          {userName}
         </h6>
         <div className="text-sm italic text-gray-500">{commentTimeAgo}</div>
-        <p className="md:text-sm text-xs">{comment}</p>
+        <p className="md:text-sm text-xs">{details}</p>
       </div>
     </div>
   );

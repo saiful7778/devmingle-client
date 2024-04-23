@@ -1,12 +1,11 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
 import { useQuery } from "@tanstack/react-query";
-import useAxios from "../hooks/useAxios";
-import Loading from "../components/Loading";
-import { Empty } from "keep-react";
-import notFoundImg from "../assets/img/not-found.svg";
-import PostItem from "../components/PostItem";
+import useAxios from "@/hooks/useAxios";
+import Loading from "@/components/Loading";
+import PostItem from "@/components/PostItem";
 import { Pagination } from "keep-react";
+import ErrorDataShow from "@/components/ErrorDataShow";
 
 const AllPostComp = ({ tag, currentPage, setCurrentPage }) => {
   const axios = useAxios();
@@ -16,19 +15,18 @@ const AllPostComp = ({ tag, currentPage, setCurrentPage }) => {
     data: posts,
     isLoading,
     isError,
-    error,
   } = useQuery({
     queryKey: ["posts", { currentPage, itemsPerPage, tag }],
     queryFn: async () => {
-      const res = await axios.get("/post/all", {
+      const { data } = await axios.get("/posts/all", {
         params: { page: currentPage - 1, size: itemsPerPage, tag },
       });
       if (tag === "all") {
-        setTotalItems(res.data?.totalCount);
-        return res.data;
+        setTotalItems(data?.totalCount);
+        return data?.data;
       } else {
-        setTotalItems(res.data?.count);
-        return res.data;
+        setTotalItems(data?.count);
+        return data?.data;
       }
     },
   });
@@ -36,25 +34,16 @@ const AllPostComp = ({ tag, currentPage, setCurrentPage }) => {
     return <Loading />;
   }
   if (isError) {
-    console.error(error.message);
-    return (
-      <Empty
-        title="Oops! No post found"
-        content="You may be in the wrong place!"
-        image={<img src={notFoundImg} height={234} width={350} alt="404" />}
-      />
-    );
+    return <ErrorDataShow />;
   }
   const numberOfPage = Math.ceil(totalItems / itemsPerPage);
-
-  const renderAllPosts = posts?.result?.map((post) => (
-    <PostItem key={post._id} inputData={post} />
-  ));
 
   return (
     <div className="mb-28">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        {renderAllPosts}
+        {posts?.map((post, idx) => (
+          <PostItem key={"home_page_post" + idx} inputData={post} />
+        ))}
       </div>
       <div className="flex justify-center mt-3">
         <Pagination

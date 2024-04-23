@@ -2,20 +2,19 @@ import { useQuery } from "@tanstack/react-query";
 import { useRef } from "react";
 import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import useAxios from "../../hooks/useAxios";
-import Loading from "../../components/Loading";
-import { Empty, Badge, Avatar, Button, Textarea } from "keep-react";
-import notFoundImg from "../assets/img/not-found.svg";
-import getPostTime from "../../utility/getPostTime";
+import useAxios from "@/hooks/useAxios";
+import Loading from "@/components/Loading";
+import { Badge, Avatar, Button, Textarea } from "keep-react";
+import getPostTime from "@/utility/getPostTime";
 import {
   BsFileArrowUpFill,
   BsFileArrowDown,
   BsArrowLeftShort,
 } from "react-icons/bs";
-import useAuth from "../../hooks/useAuth";
+import useAuth from "@/hooks/useAuth";
 import Swal from "sweetalert2";
-import CheckError from "../../components/CheckError";
-import Comments from "../../components/Comments";
+import CheckError from "@/components/CheckError";
+import Comments from "@/components/Comments";
 import {
   FacebookIcon,
   FacebookShareButton,
@@ -25,7 +24,8 @@ import {
   FacebookMessengerShareButton,
 } from "react-share";
 import ReCAPTCHA from "react-google-recaptcha";
-import useTitle from "../../hooks/useTitle";
+import useTitle from "@/hooks/useTitle";
+import ErrorDataShow from "@/components/ErrorDataShow";
 
 const PostItem = () => {
   const { postID } = useParams();
@@ -45,7 +45,6 @@ const PostItem = () => {
     data: postData,
     isLoading,
     isError,
-    error,
     refetch,
   } = useQuery({
     queryKey: ["postData", postID],
@@ -59,30 +58,22 @@ const PostItem = () => {
     return <Loading />;
   }
   if (isError) {
-    console.error(error.message);
-    return (
-      <Empty
-        title="Oops! No post found"
-        content="You may be in the wrong place!"
-        image={<img src={notFoundImg} height={234} width={350} alt="404" />}
-      />
-    );
+    return <ErrorDataShow />;
   }
+
   const {
-    content: {
-      title,
-      tag,
-      des,
-      postTime: loadTime,
-      author: { imgLink, name },
-      voteCount: { upVote, downVote },
-      comment: { count },
-    },
+    title,
+    tags,
+    des,
+    createAt,
+    author: { userName, userImage },
+    voteCount: { upVote, downVote },
+    commentCount,
     comments,
-  } = postData;
+  } = postData.data;
 
   const shareUrl = `${window.location.origin}/post/${postID}`;
-  const postTime = getPostTime(loadTime);
+  const postTime = getPostTime(createAt);
   changeTitle(title);
 
   const userCond = () => {
@@ -174,21 +165,6 @@ const PostItem = () => {
     }
   };
 
-  const renderTags = tag?.map((tagEle, idx) => (
-    <Badge
-      key={"tg" + idx}
-      className="capitalize select-none"
-      colorType="light"
-      color="gray"
-      badgeType="outline"
-    >
-      {tagEle}
-    </Badge>
-  ));
-  const renderComments = comments?.map((ele) => (
-    <Comments key={ele._id} inputData={ele} />
-  ));
-
   return (
     <div className="my-6 space-y-2">
       <Link to="/post">
@@ -236,13 +212,29 @@ const PostItem = () => {
         </div>
       </div>
       <div className="flex gap-2 items-center">
-        <Avatar shape="circle" size="sm" bordered img={imgLink} />
-        <h6 className="text-lg font-medium">{name}</h6>
+        <Avatar shape="circle" size="sm" bordered img={userImage} />
+        <h6 className="text-lg font-medium">{userName}</h6>
       </div>
-      <div className="flex flex-wrap gap-1 mt-1">{renderTags}</div>
+      <div className="flex flex-wrap gap-1 mt-1">
+        {tags?.map((tagEle, idx) => (
+          <Badge
+            key={"tag" + idx}
+            className="capitalize select-none"
+            colorType="light"
+            color="gray"
+            badgeType="outline"
+          >
+            {tagEle}
+          </Badge>
+        ))}
+      </div>
       <p>{des}</p>
-      <div className="text-xl font-bold">Comments: {count}</div>
-      <div className="py-3 space-y-3">{renderComments}</div>
+      <div className="text-xl font-bold">Comments: {commentCount}</div>
+      <div className="py-3 space-y-3">
+        {comments?.map((ele, idx) => (
+          <Comments key={"comments" + idx} inputData={ele} />
+        ))}
+      </div>
       <form className="space-y-3" onSubmit={handleSubmit(submitData)}>
         <Textarea
           placeholder="Leave a comment..."

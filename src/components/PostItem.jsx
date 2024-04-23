@@ -6,34 +6,22 @@ import { BsFileArrowUpFill, BsFileArrowDown } from "react-icons/bs";
 
 const PostItem = ({ inputData }) => {
   const {
-    _id,
-    author: { imgLink, name },
+    id,
+    author: { userName, userPhoto },
     title,
-    tag,
-    postTime: loadTime,
-    comment: { count },
+    tags,
+    createdAt,
+    commentCount,
     voteCount: { upVote, downVote },
   } = inputData || {};
 
-  const postTime = getPostTime(loadTime);
-
-  const renderTags = tag?.map((tagEle, idx) => (
-    <Badge
-      key={"tg" + idx}
-      className="capitalize select-none"
-      colorType="light"
-      color="gray"
-      badgeType="outline"
-    >
-      {tagEle}
-    </Badge>
-  ));
+  const postTime = getPostTime(createdAt);
 
   return (
     <div className="flex flex-col gap-3 p-3 shadow-md bg-white rounded-md border border-blue-500">
       <Link
         className="md:text-xl font-semibold flex-1 hover:underline"
-        to={`/post/${_id}`}
+        to={`/post/${id}`}
       >
         {title}
       </Link>
@@ -41,19 +29,31 @@ const PostItem = ({ inputData }) => {
         <div>
           <div className="flex gap-2 items-center mb-2">
             <div className="flex-shrink-0">
-              <Avatar shape="circle" size="sm" bordered img={imgLink} />
+              <Avatar shape="circle" size="sm" bordered img={userPhoto} />
             </div>
             <div>
-              <h6 className="text-lg leading-5 font-medium">{name}</h6>
+              <h6 className="text-lg leading-5 font-medium">{userName}</h6>
               <div className="text-xs font-medium text-gray-600">
                 Created: {postTime}
               </div>
             </div>
           </div>
-          <div className="flex flex-wrap gap-1 mt-1">{renderTags}</div>
+          <div className="flex flex-wrap gap-1 mt-1">
+            {tags?.map((tagEle, idx) => (
+              <Badge
+                key={"tg" + idx}
+                className="capitalize select-none"
+                colorType="strong"
+                color="gray"
+                badgeType="outline"
+              >
+                {tagEle}
+              </Badge>
+            ))}
+          </div>
         </div>
         <div>
-          <div>Comments: {count}</div>
+          <div>Comments: {commentCount}</div>
           <div className="flex gap-2">
             <Badge
               className="select-none font-bold"
