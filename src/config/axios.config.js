@@ -1,9 +1,7 @@
 import axios from "axios";
 
 const axiosSecure = axios.create({
-  // baseURL: "https://devmingle.vercel.app",
-  baseURL: "http://localhost:5001",
-  withCredentials: true,
+  baseURL: import.meta.env.VITE_SERVER_URL,
 });
 
 export default axiosSecure;
