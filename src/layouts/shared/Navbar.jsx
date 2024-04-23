@@ -7,12 +7,21 @@ import { useState } from "react";
 import useAuth from "../../hooks/useAuth";
 import PropTypes from "prop-types";
 import { navLinks } from "../../api/staticData";
-import useAnnouncementCount from "../../hooks/useAnnouncementCount";
 import { Spinner } from "keep-react";
+import useAxios from "../../hooks/useAxios";
+import { useQuery } from "@tanstack/react-query";
 
 const Navbar = () => {
   const { user, logout } = useAuth();
-  const [announcementCount, loading] = useAnnouncementCount();
+  const axios = useAxios();
+  const { data, isPending } = useQuery({
+    queryKey: ["announcementCount"],
+    queryFn: async () => {
+      const { data } = await axios.get("/announcements/count");
+      return data;
+    },
+  });
+
   const navigate = useNavigate();
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const renderNavLinks = navLinks?.map((nav) => (
@@ -52,7 +61,11 @@ const Navbar = () => {
           >
             <IoNotifications size="30" />
             <div className="bg-amber-500 absolute rounded-3xl flex items-center justify-center w-[30px] h-[15px] -top-px -right-3 text-body-6">
-              {loading ? <Spinner size="xs" color="info" /> : announcementCount}
+              {isPending ? (
+                <Spinner size="xs" color="info" />
+              ) : (
+                data?.data?.count
+              )}
             </div>
           </button>
           {user ? <UserLogged user={user} logout={logout} /> : <UserLogout />}
