@@ -72,7 +72,7 @@ const Register = () => {
           setSpinner(false);
           return;
         }
-        await UserRegister(
+        await userRegister(
           axios,
           signUp,
           {
@@ -84,7 +84,7 @@ const Register = () => {
           handleNavigate
         );
       } else {
-        await UserRegister(
+        await userRegister(
           axios,
           signUp,
           { email, pass, userName },
@@ -180,7 +180,7 @@ const Register = () => {
   );
 };
 
-const UserRegister = async (axios, signUp, userData, handleNavigate) => {
+const userRegister = async (axios, signUp, userData, handleNavigate) => {
   const { user } = await signUp(userData.email, userData.pass);
 
   await updateProfile(user, {

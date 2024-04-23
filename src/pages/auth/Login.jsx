@@ -31,48 +31,49 @@ const Login = () => {
 
   changeTitle("Login - DevMingle");
 
-  const submitData = (e) => {
-    setSpinner(true);
-    const email = e.email;
-    const pass = e.password;
+  const submitData = async (e) => {
+    try {
+      setSpinner(true);
+      const email = e.email;
+      const pass = e.password;
 
-    const captchaValue = recaptcha.current.getValue();
-    if (!captchaValue) {
+      const captchaValue = recaptcha.current.getValue();
+      if (!captchaValue) {
+        Swal.fire({
+          icon: "warning",
+          text: "Please verify the reCAPTCHA!",
+        });
+        setSpinner(false);
+        return;
+      }
+
+      const { data: reCaptcha } = await axios.post("/captcha/verify", {
+        captchaValue,
+      });
+
+      if (!reCaptcha.success) {
+        Swal.fire({
+          icon: "error",
+          text: "Invalid reCaptcha!",
+        });
+        setSpinner(false);
+        return;
+      }
+
+      const { user } = await login(email, pass);
+
       Swal.fire({
-        icon: "warning",
-        text: "Please verify the reCAPTCHA!",
+        icon: "success",
+        title: user.displayName,
+        text: "Account successfully logged in!",
       });
-      return setSpinner(false);
+
+      navigate(location.state ? location.state.from.pathname : "/");
+    } catch (err) {
+      errorStatus(err);
+    } finally {
+      setSpinner(false);
     }
-    axios
-      .post("/captcha/verify", { captchaValue })
-      .then(({ data }) => {
-        if (data.success) {
-          login(email, pass)
-            .then((res) => {
-              Swal.fire({
-                icon: "success",
-                title: res.user.displayName,
-                text: "Account successfully logged in!",
-              });
-              setSpinner(false);
-              navigate(location.state ? location.state.from.pathname : "/");
-            })
-            .catch((err) => {
-              errorStatus(err);
-              setSpinner(false);
-            });
-        } else {
-          Swal.fire({
-            icon: "error",
-            text: "Invalid reCaptcha!",
-          });
-          setSpinner(false);
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-      });
   };
 
   return (
@@ -88,6 +89,7 @@ const Login = () => {
             required: "Email Address is required",
             pattern: /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/,
           })}
+          disabled={spinner}
           aria-invalid={errors.email ? "true" : "false"}
         />
         <CheckError error={errors} inputName="email" fieldName="required">
@@ -104,6 +106,7 @@ const Login = () => {
               required: "Minimum 6 characters password",
               pattern: /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,12}$/,
             })}
+            disabled={spinner}
             aria-invalid={errors.password ? "true" : "false"}
           />
           <button
@@ -133,6 +136,7 @@ const Login = () => {
         <button
           className="w-full bg-blue-600 text-white rounded-md p-2 font-medium active:focus:scale-95 duration-150"
           type="submit"
+          disabled={spinner}
         >
           {spinner ? <Spinner color="info" size="sm" /> : "LOGIN"}
         </button>
