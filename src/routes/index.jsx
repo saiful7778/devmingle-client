@@ -34,7 +34,7 @@ const MemberShip = lazy(() => import("@/pages/users/MemberShip"));
 import AdminRoute from "./AdminRoute";
 import PrivateRoute from "./PrivateRoute";
 import ErrorPage from "@/pages/ErrorPage";
-import SuspenseProvider from "@/components/SuspenseProvider";
+import SuspenseProvider from "@/context/SuspenseContext";
 
 const route = createBrowserRouter([
   {
