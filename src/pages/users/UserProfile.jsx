@@ -6,26 +6,27 @@ import { Avatar, Badge } from "keep-react";
 import { HiOutlineBadgeCheck } from "react-icons/hi";
 import { FaUserAstronaut } from "react-icons/fa";
 import useTitle from "../../hooks/useTitle";
+import ErrorDataShow from "@/components/ErrorDataShow";
 
 const UserProfile = () => {
-  const { user } = useAuth();
+  const { user, userData, token } = useAuth();
   const changeTitle = useTitle();
   const axiosSecure = useAxiosSecure();
-  const { data, isLoading, error, isError } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["user", user?.displayName],
     queryFn: async () => {
-      const res = await axiosSecure.get(`/user/${user?.uid}`, {
-        params: { email: user.email },
+      const { data } = await axiosSecure.get(`/user/data/${userData._id}`, {
+        params: { email: user.email, userId: userData._id },
+        headers: { Authorization: `Bearer ${token}` },
       });
-      return res.data;
+      return data?.data;
     },
   });
   if (isLoading) {
     return <Loading />;
   }
   if (isError) {
-    console.error(error);
-    return <div>error</div>;
+    return <ErrorDataShow />;
   }
   const { badge, userEmail, userName, userPhoto, userRole } = data;
   changeTitle("User profile - dashboard");
