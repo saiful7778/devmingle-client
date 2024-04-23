@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form";
 import CheckError from "../../components/CheckError";
 import { IoIosEye, IoIosEyeOff } from "react-icons/io";
 import useAuth from "../../hooks/useAuth";
-import axios from "axios";
 import { updateProfile } from "firebase/auth";
 import Swal from "sweetalert2";
 import useAxios from "../../hooks/useAxios";
@@ -13,10 +12,11 @@ import errorStatus from "../../utility/errorStatus";
 import ReCAPTCHA from "react-google-recaptcha";
 import useTitle from "../../hooks/useTitle";
 import SocialAuthRegister from "../../components/SocialAuthRegister";
+import imageUpload from "@/utility/imageUpload";
 
 const Register = () => {
   const { register: signUp } = useAuth();
-  const siteAxios = useAxios();
+  const axios = useAxios();
   const recaptcha = useRef(null);
   const navigate = useNavigate();
   const changeTitle = useTitle();
@@ -34,70 +34,71 @@ const Register = () => {
   const handleNavigate = () => {
     navigate("/");
   };
-  const submitData = (e) => {
-    setSpinner(true);
 
-    const userProfilePic = e.profilePic[0];
-    const userName = e.fullName;
-    const email = e.email;
-    const pass = e.password;
+  const submitData = async (e) => {
+    try {
+      setSpinner(true);
 
-    const captchaValue = recaptcha.current.getValue();
-    if (!captchaValue) {
-      Swal.fire({
-        icon: "warning",
-        text: "Please verify the reCAPTCHA!",
+      const userProfilePic = e.profilePic[0];
+      const userName = e.fullName;
+      const email = e.email;
+      const pass = e.password;
+
+      const captchaValue = recaptcha.current.getValue();
+      if (!captchaValue) {
+        Swal.fire({
+          icon: "warning",
+          text: "Please verify the reCAPTCHA!",
+        });
+        setSpinner(false);
+        return;
+      }
+
+      const { data: reCaptcha } = await axios.post("/captcha/verify", {
+        captchaValue,
       });
-      return setSpinner(false);
-    }
-    siteAxios.post("/captcha/verify", { captchaValue }).then(({ data }) => {
-      if (data.success) {
-        if (userProfilePic) {
-          const formData = new FormData();
-          formData.set("key", import.meta.env.VITE_IMGBB_API);
-          formData.append("image", userProfilePic);
-          axios
-            .post("https://api.imgbb.com/1/upload", formData)
-            .then((res) => {
-              UserRegister(
-                signUp,
-                {
-                  email,
-                  pass,
-                  userName,
-                  imgUrl: res.data.data.url,
-                },
-                setSpinner,
-                reset,
-                handleNavigate
-              );
-            })
-            .catch((err) => {
-              console.error(err);
-              Swal.fire({
-                icon: "error",
-                text: err,
-              });
-              setSpinner(false);
-            });
-        } else {
-          UserRegister(
-            signUp,
-            { email, pass, userName },
-            setSpinner,
-            reset,
-            handleNavigate
-          );
-        }
-      } else {
+      if (!reCaptcha.success) {
         Swal.fire({
           icon: "error",
           text: "Invalid reCaptcha!",
         });
         setSpinner(false);
+        return;
       }
-    });
+
+      if (userProfilePic) {
+        const imageLink = await imageUpload(userProfilePic);
+        if (!imageLink) {
+          setSpinner(false);
+          return;
+        }
+        await UserRegister(
+          axios,
+          signUp,
+          {
+            email,
+            pass,
+            userName,
+            imgUrl: imageLink,
+          },
+          handleNavigate
+        );
+      } else {
+        await UserRegister(
+          axios,
+          signUp,
+          { email, pass, userName },
+          handleNavigate
+        );
+      }
+    } catch (err) {
+      errorStatus(err);
+    } finally {
+      setSpinner(false);
+      reset();
+    }
   };
+
   return (
     <div className="lg:w-1/2 bg-white w-full mx-auto rounded-lg shadow-md p-4">
       <h3 className="text-blue-600 text-5xl font-bold text-center mb-6">
@@ -179,57 +180,34 @@ const Register = () => {
   );
 };
 
-const UserRegister = (signUp, userData, setSpinner, reset, handleNavigate) => {
-  const axios = useAxios();
-  signUp(userData.email, userData.pass)
-    .then((result) => {
-      const user = result.user;
-      updateProfile(user, {
-        displayName: userData.userName,
-        photoURL: userData?.imgUrl,
-      })
-        .then(() => {
-          const data = {
-            userName: userData.userName,
-            userEmail: userData.email,
-            userPhoto: userData?.imgUrl ? userData?.imgUrl : null,
-            userToken: user.uid,
-            badge: "bronze",
-            userRole: "user",
-            postCount: 0,
-          };
-          axios
-            .post("/user", data)
-            .then((res) => {
-              if (res.data.acknowledged) {
-                Swal.fire({
-                  title: `"${userData.userName}"`,
-                  text: "Account created successfully!",
-                  icon: "success",
-                }).then(() => {
-                  handleNavigate();
-                  reset();
-                  setSpinner(false);
-                });
-              }
-            })
-            .catch((err) => {
-              Swal.fire({
-                icon: "error",
-                text: err,
-              });
-              setSpinner(false);
-            });
-        })
-        .catch((err) => {
-          errorStatus(err);
-          setSpinner(false);
-        });
-    })
-    .catch((err) => {
-      errorStatus(err);
-      setSpinner(false);
-    });
+const UserRegister = async (axios, signUp, userData, handleNavigate) => {
+  const { user } = await signUp(userData.email, userData.pass);
+
+  await updateProfile(user, {
+    displayName: userData.userName,
+    photoURL: userData?.imgUrl,
+  });
+
+  const { data } = await axios.post("/user", {
+    userName: userData.userName,
+    userEmail: userData.email,
+    userPhoto: userData?.imgUrl ? userData?.imgUrl : null,
+    userToken: user.uid,
+  });
+
+  if (!data.success) {
+    throw new Error("User do not create");
+  }
+
+  const { isConfirmed } = await Swal.fire({
+    title: `"${userData.userName}"`,
+    text: "Account created successfully!",
+    icon: "success",
+  });
+
+  if (isConfirmed) {
+    handleNavigate();
+  }
 };
 
 export default Register;
