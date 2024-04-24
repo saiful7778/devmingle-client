@@ -2,18 +2,18 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { TextInput, Spinner, Textarea } from "keep-react";
-import CheckError from "../../components/CheckError";
-import useAuth from "../../hooks/useAuth";
-import useAxiosSecure from "../../hooks/useAxiosSecure";
-import { postTags } from "../../api/staticData";
+import CheckError from "@/components/CheckError";
+import useAuth from "@/hooks/useAuth";
+import useAxiosSecure from "@/hooks/useAxiosSecure";
+import { postTags } from "@/api/staticData";
 import { RxCross2 } from "react-icons/rx";
 import PropTypes from "prop-types";
 import Swal from "sweetalert2";
 import { Badge } from "keep-react";
-import useTitle from "../../hooks/useTitle";
+import useTitle from "@/hooks/useTitle";
 
 const AddPost = () => {
-  const { user } = useAuth();
+  const { user, userData, token } = useAuth();
   const changeTitle = useTitle();
   const axiosSecure = useAxiosSecure();
   const navigate = useNavigate();
@@ -54,61 +54,53 @@ const AddPost = () => {
     </TagComp>
   ));
 
-  const submitData = (e) => {
-    const postTime = new Date().getTime();
-    setSpinner(true);
-    const title = e.title;
-    const des = e.des;
-    if (tag.length === 0) {
-      return setSpinner(false);
-    }
-    const body = {
-      title,
-      des,
-      tag,
-      postTime,
-      author: {
-        name: user.displayName,
-        imgLink: user?.photoURL ? user?.photoURL : null,
-        email: user.email,
-      },
-      voteCount: {
-        upVote: 0,
-        downVote: 0,
-      },
-      comment: {
-        count: 0,
-      },
-    };
-    axiosSecure
-      .post("/post", body, { params: { email: user.email, uid: user.uid } })
-      .then(({ data }) => {
-        if (data.message) {
-          Swal.fire({
-            icon: "success",
-            title: "Post is created",
-          });
-        } else {
-          Swal.fire({
-            icon: "error",
-            title: "You have reached 5 post!",
-            text: "Please update your membership",
-            confirmButtonText: "Become a member",
-          }).then((result) => {
-            if (result.isConfirmed) {
-              navigate("/membership");
-            }
-          });
-        }
-        reset();
-        setTag([]);
+  const submitData = async (e) => {
+    try {
+      setSpinner(true);
+      if (tag.length === 0) {
+        Swal.fire({
+          icon: "error",
+          text: "Please enter tag",
+        });
         setSpinner(false);
-      })
-      .catch((err) => {
-        console.error(err);
-        reset();
-        setSpinner(false);
+        return;
+      }
+
+      const body = {
+        title: e.title,
+        des: e.des,
+        tag,
+      };
+
+      const { data } = await axiosSecure.post("/post", body, {
+        params: { email: user.email, userId: userData._id },
+        headers: { Authorization: `Bearer ${token}` },
       });
+      if (!data.success) {
+        const { isConfirmed } = await Swal.fire({
+          icon: "error",
+          title: "You have reached 5 post!",
+          text: "Please update your membership",
+          confirmButtonText: "Become a member",
+        });
+        if (isConfirmed) {
+          navigate("/membership");
+        }
+      }
+      Swal.fire({
+        icon: "success",
+        title: "Post is created",
+      });
+    } catch (err) {
+      Swal.fire({
+        icon: "error",
+        text: err,
+      });
+    } finally {
+      setSpinner(false);
+      setTag([]);
+      reset();
+    }
   };
 
   return (
