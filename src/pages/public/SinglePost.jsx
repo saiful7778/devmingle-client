@@ -66,7 +66,7 @@ const SinglePost = () => {
     tags,
     des,
     createdAt,
-    author: { userName, userImage },
+    author: { userName, userPhoto },
     voteCount: { upVote, downVote },
     commentCount,
     comments,
@@ -102,11 +102,20 @@ const SinglePost = () => {
         const voteValue =
           voteKey === "upVote" ? upVote : voteKey === "downVote" && downVote;
 
+        const deffVoteKey =
+          voteKey === "upVote"
+            ? "downVote"
+            : voteKey === "downVote" && "upVote";
+
+        const deffVoteValue =
+          voteKey === "upVote" ? downVote : voteKey === "downVote" && upVote;
+
         const { data } = await axios.patch(
           `/post/update/${postID}`,
           {
             voteCount: {
               [voteKey]: parseInt(voteValue) + 1,
+              [deffVoteKey]: deffVoteValue,
             },
           },
           {
@@ -226,8 +235,13 @@ const SinglePost = () => {
         </div>
       </div>
       <div className="flex gap-2 items-center">
-        <Avatar shape="circle" size="sm" bordered img={userImage} />
-        <h6 className="text-lg font-medium">{userName}</h6>
+        <Avatar shape="circle" size="sm" bordered img={userPhoto} />
+        <Link
+          to={`/user/${userData?._id}`}
+          className="text-lg font-medium hover:underline"
+        >
+          {userName}
+        </Link>
       </div>
       <div className="flex flex-wrap gap-1 mt-1">
         {tags?.map((tagEle, idx) => (

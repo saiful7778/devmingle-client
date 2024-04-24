@@ -8,7 +8,7 @@ import { FaUserAstronaut } from "react-icons/fa";
 import useTitle from "../../hooks/useTitle";
 import ErrorDataShow from "@/components/ErrorDataShow";
 
-const UserProfile = () => {
+const Profile = () => {
   const { user, userData, token } = useAuth();
   const changeTitle = useTitle();
   const axiosSecure = useAxiosSecure();
@@ -70,4 +70,4 @@ const UserProfile = () => {
   );
 };
 
-export default UserProfile;
+export default Profile;

@@ -1,30 +1,39 @@
 import { Avatar } from "keep-react";
 import PropTypes from "prop-types";
 import moment from "moment";
+import { Link } from "react-router-dom";
 
 const Comments = ({ inputData }) => {
   const {
-    user: { userName, userImage },
+    user: { id, userName, userPhoto },
     details,
     createdAt,
   } = inputData || {};
+
   const commentTimeAgo = moment(createdAt).fromNow();
   return (
     <div className="flex gap-2">
       <div className="flex-shrink-0">
-        <Avatar shape="circle" size="sm" bordered img={userImage} />
+        <Avatar shape="circle" size="md" bordered img={userPhoto} />
       </div>
       <div>
-        <h6 className="text-lg text-blue-600 leading-3 font-semibold">
+        <Link
+          to={`/user/${id}`}
+          className="text-blue-600 hover:underline font-semibold"
+        >
           {userName}
-        </h6>
-        <div className="text-sm italic text-gray-500">{commentTimeAgo}</div>
+        </Link>
+        <div className="text-xs italic text-gray-500 leading-tight">
+          {commentTimeAgo}
+        </div>
         <p className="md:text-sm text-xs">{details}</p>
       </div>
     </div>
   );
 };
+
 Comments.propTypes = {
   inputData: PropTypes.object,
 };
+
 export default Comments;

@@ -24,7 +24,7 @@ const ManageAnnouncement = lazy(() =>
 );
 
 // user pages
-const UserProfile = lazy(() => import("@/pages/users/UserProfile"));
+const Profile = lazy(() => import("@/pages/users/Profile"));
 const AddPost = lazy(() => import("@/pages/users/AddPost"));
 const MyPost = lazy(() => import("@/pages/users/MyPost"));
 const Comments = lazy(() => import("@/pages/users/Comments"));
@@ -36,6 +36,7 @@ import PrivateRoute from "./PrivateRoute";
 import AuthRoute from "./AuthRoute";
 import ErrorPage from "@/pages/ErrorPage";
 import SuspenseProvider from "@/context/SuspenseContext";
+import UserProfile from "@/pages/public/UserProfile";
 
 const route = createBrowserRouter([
   {
@@ -54,6 +55,10 @@ const route = createBrowserRouter([
             <Login />
           </AuthRoute>
         ),
+      },
+      {
+        path: "user/:userId",
+        element: <UserProfile />,
       },
       {
         path: "/register",
@@ -107,7 +112,7 @@ const route = createBrowserRouter([
     children: [
       {
         path: "profile",
-        element: <UserProfile />,
+        element: <Profile />,
       },
       {
         path: "add_post",

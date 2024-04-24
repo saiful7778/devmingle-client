@@ -8,32 +8,26 @@ const AllPost = () => {
   const [tag, setTag] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
 
-  const renderTabButtons = postTags?.map((tab) => (
-    <TabButton
-      key={"tb" + tab._id}
-      inputData={tab}
-      setTag={setTag}
-      setCurrentPage={setCurrentPage}
-    />
-  ));
-
   return (
     <div className="my-20">
       <h2 className="text-center text-4xl font-bold my-5">All posts</h2>
-      <div className="text-center font-medium">
-        Result of {`"`}
-        {tag}
-        {`"`} post tags
-      </div>
       <div className="flex flex-wrap gap-2 items-center justify-center my-4">
         <Button
-          type="outlinePrimary"
+          type={tag === "all" ? "primary" : "outlinePrimary"}
           onClick={() => setTag("all")}
           className="btn capitalize"
         >
           all
         </Button>
-        {renderTabButtons}
+        {postTags?.map((tab) => (
+          <TabButton
+            key={"tb" + tab._id}
+            inputData={tab}
+            tag={tag}
+            setTag={setTag}
+            setCurrentPage={setCurrentPage}
+          />
+        ))}
       </div>
       <AllPostComp
         tag={tag}
@@ -44,14 +38,14 @@ const AllPost = () => {
   );
 };
 
-const TabButton = ({ inputData, setTag, setCurrentPage }) => {
+const TabButton = ({ inputData, tag, setTag, setCurrentPage }) => {
   const handleAddTag = () => {
     setTag(inputData.tagName);
     setCurrentPage(1);
   };
   return (
     <Button
-      type="outlinePrimary"
+      type={tag === inputData.tagName ? "primary" : "outlinePrimary"}
       onClick={handleAddTag}
       className="btn capitalize"
     >
@@ -63,6 +57,7 @@ const TabButton = ({ inputData, setTag, setCurrentPage }) => {
 TabButton.propTypes = {
   inputData: PropTypes.object,
   setTag: PropTypes.func,
+  tag: PropTypes.string,
   setCurrentPage: PropTypes.func,
 };
 

@@ -22,7 +22,7 @@ const useAxiosSecure = () => {
         }
       }
     );
-  }, []);
+  }, [logout, navigate]);
   return axiosSecure;
 };
 

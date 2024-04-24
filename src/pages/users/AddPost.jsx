@@ -29,24 +29,11 @@ const AddPost = () => {
 
   const handleAddTag = (currentTag) => {
     if (!tag.includes(currentTag)) {
-      setTag([...tag, currentTag]);
+      setTag((prop) => [...prop, currentTag]);
     }
   };
 
   changeTitle("Add post - dashboard");
-
-  const renderTags = postTags?.map((tagEle) => (
-    <Badge
-      key={tagEle._id}
-      className="capitalize select-none"
-      colorType="light"
-      color="gray"
-      badgeType="outline"
-      onClick={() => handleAddTag(tagEle.tagName)}
-    >
-      {tagEle.tagName}
-    </Badge>
-  ));
 
   const renderSelectedTags = tag.map((ele, idx) => (
     <TagComp key={"tg" + idx} allTags={tag} setAllTags={setTag}>
@@ -133,7 +120,20 @@ const AddPost = () => {
               </div>
             )}
           </div>
-          <div className="flex flex-wrap gap-1 mt-1">{renderTags}</div>
+          <div className="flex flex-wrap gap-1 mt-1">
+            {postTags?.map((tagEle) => (
+              <Badge
+                key={tagEle._id}
+                className="capitalize select-none"
+                colorType="light"
+                color="gray"
+                badgeType="outline"
+                onClick={() => handleAddTag(tagEle.tagName)}
+              >
+                {tagEle.tagName}
+              </Badge>
+            ))}
+          </div>
         </div>
         <div>
           <Textarea
