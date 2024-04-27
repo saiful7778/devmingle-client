@@ -27,7 +27,7 @@ const ManageAnnouncement = lazy(() =>
 const Profile = lazy(() => import("@/pages/users/Profile"));
 const AddPost = lazy(() => import("@/pages/users/AddPost"));
 const MyPost = lazy(() => import("@/pages/users/MyPost"));
-const Comments = lazy(() => import("@/pages/users/Comments"));
+const PostComments = lazy(() => import("@/pages/users/PostComments"));
 const MemberShip = lazy(() => import("@/pages/users/MemberShip"));
 
 // routes
@@ -102,11 +102,11 @@ const route = createBrowserRouter([
   {
     path: "/dashboard",
     element: (
-      <SuspenseProvider>
-        <PrivateRoute>
+      <PrivateRoute>
+        <SuspenseProvider>
           <DashboardLayout />
-        </PrivateRoute>
-      </SuspenseProvider>
+        </SuspenseProvider>
+      </PrivateRoute>
     ),
     errorElement: <ErrorPage />,
     children: [
@@ -124,7 +124,7 @@ const route = createBrowserRouter([
       },
       {
         path: "comments/:postId",
-        element: <Comments />,
+        element: <PostComments />,
       },
 
       // admin routes

@@ -115,7 +115,7 @@ const UserLogged = ({ user, logout }) => {
         <>
           <div>{user.displayName}</div>
           <div>
-            <Link to="/dashboard">Dashboard</Link>
+            <Link to="/dashboard/profile">Dashboard</Link>
           </div>
           <Button
             onClick={handleLogout}

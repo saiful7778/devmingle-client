@@ -8,26 +8,21 @@ const SocialAuthLogin = () => {
   const { googleAuth } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const handleGoogleAuth = () => {
-    googleAuth()
-      .then((res) => {
-        const user = res.user;
-        Swal.fire({
-          icon: "success",
-          title: user.displayName,
-          text: "Account successfully logged in!",
-        });
-        navigate(location.state ? location.state.from.pathname : "/");
-      })
-      .catch((err) => {
-        Swal.fire({
-          icon: "error",
-          text: err,
-        });
-      })
-      .catch((err) => {
-        console.error(err);
+  const handleGoogleAuth = async () => {
+    try {
+      const { user } = await googleAuth();
+      Swal.fire({
+        icon: "success",
+        title: user.displayName,
+        text: "Account successfully logged in!",
       });
+      navigate(location.state ? location.state.from.pathname : "/");
+    } catch (err) {
+      Swal.fire({
+        icon: "error",
+        text: err,
+      });
+    }
   };
   return (
     <div className="flex gap-2 justify-center items-center mt-4">

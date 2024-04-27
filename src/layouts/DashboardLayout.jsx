@@ -11,22 +11,22 @@ import { useEffect } from "react";
 const DashboardLayout = () => {
   const [showSidebar, setShowSidebar] = useState(true);
   const navigate = useNavigate();
-  const [isAdmin] = useAdmin();
+  const { isAdmin } = useAdmin();
 
   useEffect(() => {
-    if (isAdmin) {
-      console.log("admin");
-      navigate("/dashboard/profile");
-    } else {
-      navigate("/dashboard/profile");
-    }
+    // if (isAdmin) {
+    //   console.log("admin");
+    //   navigate("/dashboard/profile");
+    // } else {
+    //   navigate("/dashboard/profile");
+    // }
   }, [isAdmin, navigate]);
 
-  const renderSidebarLinks = sidebarLinks?.map((sideNav) => {
+  const renderSidebarLinks = sidebarLinks?.map((sideNav, idx) => {
     if (!sideNav?.adminRoute) {
-      return <SidebarItem key={sideNav._id} inputData={sideNav} />;
+      return <SidebarItem key={"sidebar-item" + idx} inputData={sideNav} />;
     } else if (isAdmin) {
-      return <SidebarItem key={sideNav._id} inputData={sideNav} />;
+      return <SidebarItem key={"sidebar-item" + idx} inputData={sideNav} />;
     }
   });
 

@@ -1,64 +1,56 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
-import useTitle from "../../hooks/useTitle";
+import useTitle from "@/hooks/useTitle";
 import { useQuery } from "@tanstack/react-query";
-import useAxiosSecure from "../../hooks/useAxiosSecure";
-import useAuth from "../../hooks/useAuth";
-import Loading from "../../components/Loading";
-import { Avatar, Button, Dropdown, Empty, Table, Modal, Tag } from "keep-react";
-import notFoundImg from "../assets/img/not-found.svg";
-import getPostTime from "../../utility/getPostTime";
+import useAxiosSecure from "@/hooks/useAxiosSecure";
+import useAuth from "@/hooks/useAuth";
+import Loading from "@/components/Loading";
+import { Avatar, Button, Dropdown, Table, Modal, Tag } from "keep-react";
+import getPostTime from "@/utility/getPostTime";
 import { GoCommentDiscussion } from "react-icons/go";
 import PropTypes from "prop-types";
 import Swal from "sweetalert2";
+import ErrorDataShow from "@/components/ErrorDataShow";
 
 const Comments = () => {
   const { postId } = useParams();
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const changeTitle = useTitle();
 
-  const axiosSecure = useAxiosSecure();
-  const {
-    data: commentData,
-    isLoading,
-    isError,
-    error,
-  } = useQuery({
-    queryKey: ["postComment", postId],
-    queryFn: async () => {
-      const { data } = await axiosSecure.get(`/post/${postId}/comments`, {
-        params: { email: user.email },
-      });
-      return data;
-    },
-  });
-  if (isLoading) {
-    return <Loading />;
-  }
-  if (isError) {
-    console.error(error.message);
-    return (
-      <Empty
-        title="Oops! No post found"
-        content="You may be in the wrong place!"
-        image={<img src={notFoundImg} height={234} width={350} alt="404" />}
-      />
-    );
-  }
+  // const axiosSecure = useAxiosSecure();
+
+  console.log(token);
+
+  // const {
+  //   data: commentData,
+  //   isLoading,
+  //   isError,
+  // } = useQuery({
+  //   queryKey: ["postComment", postId],
+  //   queryFn: async () => {
+  //     const { data } = await axiosSecure.get(
+  //       `/post/comment/all-comment/${postId}`,
+  //       {
+  //         params: { email: user.email },
+  //         headers: { Authorization: `Bearer ${token}` },
+  //       }
+  //     );
+  //     return data?.data;
+  //   },
+  // });
+  // if (isLoading) {
+  //   return <Loading />;
+  // }
+  // if (isError) {
+  //   return <ErrorDataShow />;
+  // }
   changeTitle("Comments - DevMingle");
 
-  if (commentData?.length === 0) {
-    return (
-      <Empty
-        title="Oops! No comments found"
-        image={<img src={notFoundImg} height={234} width={350} alt="404" />}
-      />
-    );
-  }
+  // if (commentData?.length < 1) {
+  //   return <ErrorDataShow />;
+  // }
 
-  const renderComments = commentData?.map((comment) => (
-    <TableRow key={comment._id} inputData={comment} />
-  ));
+  // console.log(commentData);
 
   return (
     <Table
@@ -92,7 +84,9 @@ const Comments = () => {
         </Table.HeadCell>
       </Table.Head>
       <Table.Body className="border border-gray-300">
-        {renderComments}
+        {/* {commentData?.map((comment, idx) => (
+          <TableRow key={"comment" + idx} inputData={comment} />
+        ))} */}
       </Table.Body>
     </Table>
   );

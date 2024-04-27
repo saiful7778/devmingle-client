@@ -26,6 +26,7 @@ const AuthContextProvider = ({ children }) => {
   };
 
   const googleAuth = () => {
+    setLoader(true);
     const provider = new GoogleAuthProvider();
     return signInWithPopup(auth, provider);
   };
@@ -36,16 +37,17 @@ const AuthContextProvider = ({ children }) => {
   };
 
   const logout = () => {
+    setLoader(true);
     return signOut(auth);
   };
 
   useEffect(() => {
     const unSubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
-      const userData = { userEmail: currentUser?.email };
+
       if (currentUser) {
         axios
-          .post("/authentication/login", userData)
+          .post("/authentication/login", { userEmail: currentUser?.email })
           .then(({ data }) => {
             setUserData(data.userData);
             setToken(data.token);
@@ -57,6 +59,7 @@ const AuthContextProvider = ({ children }) => {
         setUserData(null);
         setToken(null);
       }
+
       setLoader(false);
     });
 
@@ -64,6 +67,7 @@ const AuthContextProvider = ({ children }) => {
       unSubscribe();
     };
   }, [axios]);
+
   return (
     <AuthContext.Provider
       value={{

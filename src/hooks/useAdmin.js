@@ -15,7 +15,7 @@ const useAdmin = () => {
       return data?.data?.admin;
     },
   });
-  return [isAdmin, isPending];
+  return { isAdmin, isPending };
 };
 
 export default useAdmin;

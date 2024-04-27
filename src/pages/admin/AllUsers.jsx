@@ -1,53 +1,43 @@
 import { useQuery } from "@tanstack/react-query";
-import useAuth from "../../hooks/useAuth";
-import useTitle from "../../hooks/useTitle";
-import useAxiosSecure from "../../hooks/useAxiosSecure";
-import Loading from "../../components/Loading";
-import { Avatar, Button, Empty, Table, Badge, Tag } from "keep-react";
-import notFoundImg from "../../assets/img/not-found.svg";
+import useAuth from "@/hooks/useAuth";
+import useTitle from "@/hooks/useTitle";
+import useAxiosSecure from "@/hooks/useAxiosSecure";
+import Loading from "@/components/Loading";
+import { Avatar, Button, Table, Badge, Tag } from "keep-react";
 import { FaTrashCan } from "react-icons/fa6";
 import PropTypes from "prop-types";
 import { FaUsers, FaUserAstronaut } from "react-icons/fa";
 import Swal from "sweetalert2";
 import { useState } from "react";
+import ErrorDataShow from "@/components/ErrorDataShow";
+import { Link } from "react-router-dom";
 
 const AllUsers = () => {
-  const { user } = useAuth();
+  const { user, token, userData } = useAuth();
   const changeTitle = useTitle();
   const axiosSecure = useAxiosSecure();
   const {
     data: usersData,
     isLoading,
     isError,
-    error,
     refetch,
   } = useQuery({
     queryKey: ["allUsers"],
     queryFn: async () => {
-      const { data } = await axiosSecure.get("/user/admin/all", {
-        params: { email: user.email },
+      const { data } = await axiosSecure.get("/users", {
+        params: { email: user.email, userId: userData._id },
+        headers: { Authorization: `Bearer ${token}` },
       });
-      return data;
+      return data?.data;
     },
   });
   if (isLoading) {
     return <Loading />;
   }
   if (isError) {
-    console.error(error.message);
-    return (
-      <Empty
-        title="Oops! No data found"
-        content="You may be in the wrong place!"
-        image={<img src={notFoundImg} height={234} width={350} alt="404" />}
-      />
-    );
+    return <ErrorDataShow />;
   }
   changeTitle("All user - admin - DevMingle");
-
-  const renderUsers = usersData?.map((ele, idx) => (
-    <TableRow key={ele._id} inputData={ele} count={idx + 1} reFatch={refetch} />
-  ));
 
   return (
     <Table
@@ -86,38 +76,41 @@ const AllUsers = () => {
           Action
         </Table.HeadCell>
       </Table.Head>
-      <Table.Body className="border border-gray-300">{renderUsers}</Table.Body>
+      <Table.Body className="border border-gray-300">
+        {usersData?.map((ele, idx) => (
+          <TableRow
+            key={"user" + idx}
+            inputData={ele}
+            count={idx + 1}
+            reFatch={refetch}
+          />
+        ))}
+      </Table.Body>
     </Table>
   );
 };
 
 const TableRow = ({ inputData, count, reFatch }) => {
-  const {
-    _id,
-    userName,
-    userEmail,
-    userPhoto,
-    userRole,
-    postCount,
-    badge,
-    // userToken,
-  } = inputData || {};
-  const { user } = useAuth();
+  const { id, userName, userEmail, userPhoto, userRole, postCount, badge } =
+    inputData;
+
+  const { user, userData, token } = useAuth();
   const axiosSecure = useAxiosSecure();
   const [buttonDisable, setButtonDisable] = useState(
     userRole === "admin" ? true : false
   );
 
-  const handleAdmin = () => {
-    Swal.fire({
-      icon: "info",
-      title: "Are you sure?",
-      text: `Make "${userName}" admin account.`,
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes",
-    }).then(({ isConfirmed }) => {
+  const handleAdmin = async () => {
+    try {
+      const { isConfirmed } = await Swal.fire({
+        icon: "info",
+        title: "Are you sure?",
+        text: `Make "${userName}" admin account.`,
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes",
+      });
       if (isConfirmed) {
         Swal.fire({
           title: "Loading....",
@@ -126,56 +119,45 @@ const TableRow = ({ inputData, count, reFatch }) => {
           },
           showConfirmButton: false,
         });
-        axiosSecure
-          .patch(
-            `/user/admin/make_admin/${_id}`,
-            {
-              userEmail,
-            },
-            {
-              params: { email: user.email },
-            }
-          )
-          .then(({ data }) => {
-            if (data?.modifiedCount === 1) {
-              Swal.fire({
-                title: "Successfully!",
-                text: `"${userName}" is admin.`,
-                icon: "success",
-              });
-              setButtonDisable(true);
-              reFatch();
-            } else {
-              Swal.fire({
-                title: "Error!",
-                text: `"${userName}" is not admin.`,
-                icon: "error",
-              });
-              reFatch();
-            }
-          })
-          .catch((err) => {
-            console.error(err);
-            Swal.fire({
-              title: "Error!",
-              text: `"${userName}" is not admin.`,
-              icon: "error",
-            });
-          });
+        const { data } = await axiosSecure.patch(
+          `/user/admin/make_admin/${id}`,
+          {},
+          {
+            params: { email: user.email, userId: userData._id },
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        if (data?.data?.modifiedCount !== 1) {
+          throw new Error("Something went wrong");
+        }
+        Swal.fire({
+          title: "Successfully!",
+          text: `"${userName}" is admin.`,
+          icon: "success",
+        });
       }
-    });
+    } catch (err) {
+      Swal.fire({
+        icon: "error",
+        text: err,
+      });
+    } finally {
+      reFatch();
+      setButtonDisable(true);
+    }
   };
 
-  const handleDelete = () => {
-    Swal.fire({
-      icon: "warning",
-      title: "Are you sure?",
-      text: `Delete "${userName}" account`,
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, delete it!",
-    }).then(({ isConfirmed }) => {
+  const handleDelete = async () => {
+    try {
+      const { isConfirmed } = await Swal.fire({
+        icon: "warning",
+        title: "Are you sure?",
+        text: `Delete "${userName}" account`,
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!",
+      });
       if (isConfirmed) {
         Swal.fire({
           title: "Loading....",
@@ -184,40 +166,31 @@ const TableRow = ({ inputData, count, reFatch }) => {
           },
           showConfirmButton: false,
         });
-        axiosSecure
-          .delete(`/user/admin/delete_account/${_id}`, {
-            params: {
-              email: user.email,
-              userEmail,
-            },
-          })
-          .then(({ data }) => {
-            if (data?.result?.deletedCount === 1) {
-              Swal.fire({
-                title: "Deleted!",
-                text: `"${userName}" has been deleted.`,
-                icon: "success",
-              });
-              reFatch();
-            } else {
-              Swal.fire({
-                title: "Delete incomplate!",
-                text: `"${userName}" is not deleted.`,
-                icon: "error",
-              });
-              reFatch();
-            }
-          })
-          .catch((err) => {
-            console.error(err);
-            Swal.fire({
-              title: "Delete incomplate!",
-              text: `"${userName}" is not deleted.`,
-              icon: "error",
-            });
-          });
+        const { data } = await axiosSecure.delete(
+          `/user/admin/delete_account/${id}`,
+          {
+            params: { email: user.email, userId: userData._id },
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        if (!data.success) {
+          throw new Error("Someting went wrong");
+        }
+        Swal.fire({
+          icon: "success",
+          title: "Successfully!",
+          text: `"${userName}" is deleted.`,
+        });
       }
-    });
+    } catch (err) {
+      Swal.fire({
+        icon: "error",
+        text: err,
+      });
+    } finally {
+      reFatch();
+      setButtonDisable(true);
+    }
   };
 
   return (
@@ -229,9 +202,12 @@ const TableRow = ({ inputData, count, reFatch }) => {
         <div className="flex items-center gap-2">
           <Avatar shape="circle" bordered={true} img={userPhoto} size="md" />
           <div>
-            <p className="-mb-0.5 text-body-4 font-medium text-metal-600">
+            <Link
+              to={`/user/${id}`}
+              className="-mb-0.5 block hover:underline text-body-4 font-medium text-metal-600"
+            >
               {userName}
-            </p>
+            </Link>
             <span>{userEmail}</span>
           </div>
         </div>

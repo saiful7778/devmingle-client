@@ -1,13 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
-import useAxios from "../../hooks/useAxios";
-import Loading from "../../components/Loading";
-import { Avatar, Button, Empty, Table, Tag } from "keep-react";
-import notFoundImg from "../../assets/img/not-found.svg";
+import useAxios from "@/hooks/useAxios";
+import Loading from "@/components/Loading";
+import { Avatar, Button, Table, Tag } from "keep-react";
 import { FaTrashCan } from "react-icons/fa6";
 import PropTypes from "prop-types";
-import useAxiosSecure from "../../hooks/useAxiosSecure";
-import useAuth from "../../hooks/useAuth";
+import useAxiosSecure from "@/hooks/useAxiosSecure";
+import useAuth from "@/hooks/useAuth";
 import Swal from "sweetalert2";
+import ErrorDataShow from "@/components/ErrorDataShow";
+import { Link } from "react-router-dom";
 
 const ManageAnnouncement = () => {
   const axios = useAxios();
@@ -15,39 +16,23 @@ const ManageAnnouncement = () => {
     data: allAnnouncement,
     isLoading,
     isError,
-    error,
     refetch,
   } = useQuery({
     queryKey: ["allAnnouncement"],
     queryFn: async () => {
-      const { data } = await axios.get("/announcement");
-      return data;
+      const { data } = await axios.get("/announcements");
+      return data?.data;
     },
   });
   if (isLoading) {
     return <Loading />;
   }
   if (isError) {
-    console.error(error);
-    return (
-      <Empty
-        title="Oops! No announcement found"
-        image={<img src={notFoundImg} height={234} width={350} alt="404" />}
-      />
-    );
+    return <ErrorDataShow />;
   }
-  if (allAnnouncement?.length === 0) {
-    return (
-      <Empty
-        title="Oops! No announcement found"
-        image={<img src={notFoundImg} height={234} width={350} alt="404" />}
-      />
-    );
+  if (allAnnouncement?.length < 1) {
+    return <ErrorDataShow />;
   }
-
-  const renderReports = allAnnouncement?.map((ele, idx) => (
-    <TableRow key={ele._id} inputData={ele} count={idx + 1} reFatch={refetch} />
-  ));
 
   return (
     <Table
@@ -82,7 +67,14 @@ const ManageAnnouncement = () => {
         </Table.HeadCell>
       </Table.Head>
       <Table.Body className="border border-gray-300">
-        {renderReports}
+        {allAnnouncement?.map((ele, idx) => (
+          <TableRow
+            key={"admin-announcement" + idx}
+            inputData={ele}
+            count={idx + 1}
+            reFatch={refetch}
+          />
+        ))}
       </Table.Body>
     </Table>
   );
@@ -90,23 +82,24 @@ const ManageAnnouncement = () => {
 
 const TableRow = ({ inputData, count, reFatch }) => {
   const {
-    _id,
+    id,
     title,
-    des,
-    authorInfo: { name, imgLink },
-  } = inputData || {};
+    details,
+    author: { id: userId, userName, userPhoto },
+  } = inputData;
   const axiosSecure = useAxiosSecure();
-  const { user } = useAuth();
+  const { user, userData, token } = useAuth();
 
-  const handleDelete = () => {
-    Swal.fire({
-      icon: "warning",
-      title: "Are you sure?",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, delete it!",
-    }).then(({ isConfirmed }) => {
+  const handleDelete = async () => {
+    try {
+      const { isConfirmed } = await Swal.fire({
+        icon: "warning",
+        title: "Are you sure?",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!",
+      });
       if (isConfirmed) {
         Swal.fire({
           title: "Loading....",
@@ -115,34 +108,26 @@ const TableRow = ({ inputData, count, reFatch }) => {
           },
           showConfirmButton: false,
         });
-        axiosSecure
-          .delete(`/announcement/${_id}`, {
-            params: { email: user.email },
-          })
-          .then(({ data }) => {
-            if (data?.deletedCount === 1) {
-              Swal.fire({
-                title: "Deleted!",
-                icon: "success",
-              });
-              reFatch();
-            } else {
-              Swal.fire({
-                title: "Delete incomplate!",
-                icon: "error",
-              });
-              reFatch();
-            }
-          })
-          .catch((err) => {
-            console.error(err);
-            Swal.fire({
-              title: "Delete incomplate!",
-              icon: "error",
-            });
-          });
+        const { data } = await axiosSecure.delete(`/announcement/${id}`, {
+          params: { email: user.email, userId: userData._id },
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!data.success) {
+          throw new Error("Something went wrong");
+        }
+        Swal.fire({
+          icon: "success",
+          title: "Announcement is deleted",
+        });
       }
-    });
+    } catch (err) {
+      Swal.fire({
+        icon: "error",
+        text: err,
+      });
+    } finally {
+      reFatch();
+    }
   };
 
   return (
@@ -153,11 +138,16 @@ const TableRow = ({ inputData, count, reFatch }) => {
       <Table.Cell className="border-r-gray-300 py-1 px-2">
         <h6>{title}</h6>
       </Table.Cell>
-      <Table.Cell className="border-r-gray-300 py-1 px-2">{des}</Table.Cell>
+      <Table.Cell className="border-r-gray-300 py-1 px-2">{details}</Table.Cell>
       <Table.Cell className="border-r-gray-300 py-1 px-2 whitespace-nowrap">
         <div className="flex items-center gap-2">
-          <Avatar shape="circle" bordered={true} img={imgLink} size="sm" />
-          <p className="leading-4 font-medium">{name}</p>
+          <Avatar shape="circle" bordered={true} img={userPhoto} size="sm" />
+          <Link
+            to={`/user/${userId}`}
+            className="leading-4 hover:underline font-medium"
+          >
+            {userName}
+          </Link>
         </div>
       </Table.Cell>
       <Table.Cell className="border-r-gray-300 py-1 p-2">

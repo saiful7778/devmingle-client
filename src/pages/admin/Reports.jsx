@@ -1,62 +1,50 @@
 import { useQuery } from "@tanstack/react-query";
-import useAxiosSecure from "../../hooks/useAxiosSecure";
-import useAuth from "../../hooks/useAuth";
-import { Button, Empty, Table, Tag } from "keep-react";
-import Loading from "../../components/Loading";
-import notFoundImg from "../../assets/img/not-found.svg";
-import useTitle from "../../hooks/useTitle";
+import useAxiosSecure from "@/hooks/useAxiosSecure";
+import useAuth from "@/hooks/useAuth";
+import { Avatar, Button, Modal, Table, Tag } from "keep-react";
+import Loading from "@/components/Loading";
+import useTitle from "@/hooks/useTitle";
+import { GoCommentDiscussion } from "react-icons/go";
 import { FaTrashCan } from "react-icons/fa6";
 import { GoReport } from "react-icons/go";
 import PropTypes from "prop-types";
 import Swal from "sweetalert2";
 import { Link } from "react-router-dom";
+import ErrorDataShow from "@/components/ErrorDataShow";
+import commentExcerpt from "@/utility/commentExcerpt";
+import { useState } from "react";
+import moment from "moment";
 
 const Reports = () => {
   const axiosSecure = useAxiosSecure();
-  const { user } = useAuth();
+  const { user, userData, token } = useAuth();
   const changeTitle = useTitle();
   const {
     data: reportData,
     isLoading,
     isError,
-    error,
     refetch,
   } = useQuery({
     queryKey: ["reports"],
     queryFn: async () => {
-      const { data } = await axiosSecure.get("/post/admin/report", {
-        params: { email: user.email },
+      const { data } = await axiosSecure.get("/post/comment/admin/reports", {
+        params: { email: user.email, userId: userData._id },
+        headers: { Authorization: `Bearer ${token}` },
       });
-      return data;
+      return data?.data;
     },
   });
   if (isLoading) {
     return <Loading />;
   }
   if (isError) {
-    console.error(error.message);
-    return (
-      <Empty
-        title="Oops! No data found"
-        content="You may be in the wrong place!"
-        image={<img src={notFoundImg} height={234} width={350} alt="404" />}
-      />
-    );
+    return <ErrorDataShow />;
   }
   changeTitle("Reports - admin - DevMingle");
 
-  if (reportData?.length === 0) {
-    return (
-      <Empty
-        title="Oops! No reports found"
-        image={<img src={notFoundImg} height={234} width={350} alt="404" />}
-      />
-    );
+  if (reportData?.length < 1) {
+    return <ErrorDataShow />;
   }
-
-  const renderReports = reportData?.map((ele, idx) => (
-    <TableRow key={ele._id} inputData={ele} count={idx + 1} reFatch={refetch} />
-  ));
 
   return (
     <Table
@@ -71,7 +59,7 @@ const Reports = () => {
             Total Reports:
           </p>
           <Tag color="error" leftIcon={<GoReport />}>
-            {reportData.length} report
+            {reportData?.length} report
           </Tag>
         </div>
       </Table.Caption>
@@ -96,7 +84,14 @@ const Reports = () => {
         </Table.HeadCell>
       </Table.Head>
       <Table.Body className="border border-gray-300">
-        {renderReports}
+        {reportData?.map((ele, idx) => (
+          <TableRow
+            key={"reports" + idx}
+            inputData={ele}
+            count={idx + 1}
+            reFatch={refetch}
+          />
+        ))}
       </Table.Body>
     </Table>
   );
@@ -104,24 +99,42 @@ const Reports = () => {
 
 const TableRow = ({ inputData, count, reFatch }) => {
   const {
-    _id,
+    id,
     feedback,
-    commentInfo: { comment },
-    postInfo: { title, postID },
-    reportUserInfo: { name, email },
-  } = inputData || {};
-  const axiosSecure = useAxiosSecure();
-  const { user } = useAuth();
+    comment: {
+      details,
+      createdAt: commentCreatedAt,
+      user: {
+        id: commentUserId,
+        userName: commentUserName,
+        userEmail: commentUserEmail,
+        userPhoto: commentUserPhoto,
+      },
+      post: { id: postId, title },
+    },
+    reportUser: { id: reportUserId, userName, userEmail, userPhoto },
+    createdAt,
+  } = inputData;
 
-  const handleDelete = () => {
-    Swal.fire({
-      icon: "warning",
-      title: "Are you sure?",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, delete it!",
-    }).then(({ isConfirmed }) => {
+  const axiosSecure = useAxiosSecure();
+  const { user, userData, token } = useAuth();
+  const [showModal, setShowModal] = useState(false);
+
+  const [excerpt, excerptedComment] = commentExcerpt(details);
+
+  const commentAddTime = moment(commentCreatedAt).format("D/M/YY, h:m:s a");
+  const reportAddTime = moment(createdAt).format("D/M/YY, h:m:s a");
+
+  const handleDelete = async () => {
+    try {
+      const { isConfirmed } = await Swal.fire({
+        icon: "warning",
+        title: "Are you sure?",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!",
+      });
       if (isConfirmed) {
         Swal.fire({
           title: "Loading....",
@@ -130,34 +143,32 @@ const TableRow = ({ inputData, count, reFatch }) => {
           },
           showConfirmButton: false,
         });
-        axiosSecure
-          .delete(`/post/admin/report/${_id}`, {
-            params: { email: user.email },
-          })
-          .then(({ data }) => {
-            if (data?.deletedCount === 1) {
-              Swal.fire({
-                title: "Deleted!",
-                icon: "success",
-              });
-              reFatch();
-            } else {
-              Swal.fire({
-                title: "Delete incomplate!",
-                icon: "error",
-              });
-              reFatch();
-            }
-          })
-          .catch((err) => {
-            console.error(err);
-            Swal.fire({
-              title: "Delete incomplate!",
-              icon: "error",
-            });
-          });
+        const { data } = await axiosSecure.delete(
+          `/post/comment/admin/report/${id}`,
+          {
+            params: { email: user.email, userId: userData._id },
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        if (!data.success) {
+          throw new Error("Something went wrong");
+        }
+        if (data?.data?.deletedCount !== 1) {
+          throw new Error("Delete is incomplete");
+        }
+        Swal.fire({
+          title: "Deleted!",
+          icon: "success",
+        });
       }
-    });
+    } catch (err) {
+      Swal.fire({
+        icon: "error",
+        text: err,
+      });
+    } finally {
+      reFatch();
+    }
   };
 
   return (
@@ -166,17 +177,79 @@ const TableRow = ({ inputData, count, reFatch }) => {
         {count}
       </Table.Cell>
       <Table.Cell className="border-r-gray-300 py-1 px-2">
-        <Link to={`/post/${postID}`} className="hover:underline">
+        <Link to={`/post/${postId}`} className="hover:underline">
           {title}
         </Link>
       </Table.Cell>
-      <Table.Cell className="border-r-gray-300 py-1 px-2">{comment}</Table.Cell>
+      <Table.Cell className="border-r-gray-300 py-1 px-2">
+        {excerpt ? (
+          <div>
+            <p>
+              {excerptedComment}
+              <button
+                type="button"
+                onClick={() => setShowModal((l) => !l)}
+                className="inline-block ml-2 text-blue-600 underline"
+              >
+                Read....
+              </button>
+            </p>
+            <Modal
+              position="center"
+              show={showModal}
+              icon={<GoCommentDiscussion size={25} />}
+              onClose={() => setShowModal((l) => !l)}
+            >
+              <Modal.Header></Modal.Header>
+              <Modal.Body>
+                <p className="text-gray-500">{details}</p>
+              </Modal.Body>
+              <Modal.Footer>
+                <Button type="primary" onClick={() => setShowModal((l) => !l)}>
+                  Done
+                </Button>
+              </Modal.Footer>
+            </Modal>
+          </div>
+        ) : (
+          <p>{excerptedComment}</p>
+        )}
+        <div className="flex items-center gap-2">
+          <Avatar
+            shape="circle"
+            bordered={true}
+            img={commentUserPhoto}
+            size="md"
+          />
+          <div>
+            <Link
+              to={`/user/${commentUserId}`}
+              className="-mb-0.5 block hover:underline text-body-4 font-medium text-metal-600"
+            >
+              {commentUserName}
+            </Link>
+            <span>{commentUserEmail}</span>
+          </div>
+        </div>
+        <p className="text-sm font-medium mt-2">Comment: {commentAddTime}</p>
+      </Table.Cell>
       <Table.Cell className="border-r-gray-300 py-1 px-2 capitalize">
         {feedback}
       </Table.Cell>
       <Table.Cell className="border-r-gray-300 py-1 px-2 whitespace-nowrap">
-        <p className="leading-4 font-semibold">{name}</p>
-        <p>{email}</p>
+        <div className="flex items-center gap-2">
+          <Avatar shape="circle" bordered={true} img={userPhoto} size="md" />
+          <div>
+            <Link
+              to={`/user/${reportUserId}`}
+              className="-mb-0.5 block hover:underline text-body-4 font-medium text-metal-600"
+            >
+              {userName}
+            </Link>
+            <span>{userEmail}</span>
+          </div>
+        </div>
+        <p className="text-sm font-medium mt-2">Report: {reportAddTime}</p>
       </Table.Cell>
       <Table.Cell className="border-r-gray-300 py-1 p-2">
         <Button

@@ -5,7 +5,7 @@ import { BsFileArrowUpFill, BsFileArrowDown } from "react-icons/bs";
 import Swal from "sweetalert2";
 import useAxiosSecure from "../hooks/useAxiosSecure";
 import useAuth from "../hooks/useAuth";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const UserPost = ({ inputData, reFatch }) => {
   const {
@@ -14,6 +14,7 @@ const UserPost = ({ inputData, reFatch }) => {
     voteCount: { upVote, downVote },
     commentCount,
   } = inputData;
+  const navigate = useNavigate();
 
   const axiosSecure = useAxiosSecure();
   const { user, userData, token } = useAuth();
@@ -79,7 +80,7 @@ const UserPost = ({ inputData, reFatch }) => {
         <div className="my-2">Comments: {commentCount}</div>
         <div className="flex gap-2 items-center">
           <Button
-            href={`/dashboard/comments/${id}`}
+            onClick={() => navigate(`/dashboard/comments/${id}`)}
             size="sm"
             className="btn"
             type="primary"

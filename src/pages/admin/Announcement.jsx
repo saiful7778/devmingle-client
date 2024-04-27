@@ -1,15 +1,15 @@
 import { useForm } from "react-hook-form";
-import CheckError from "../../components/CheckError";
+import CheckError from "@/components/CheckError";
 import { TextInput, Textarea, Spinner } from "keep-react";
 import { useState } from "react";
-import useAuth from "../../hooks/useAuth";
-import useAxiosSecure from "../../hooks/useAxiosSecure";
+import useAuth from "@/hooks/useAuth";
+import useAxiosSecure from "@/hooks/useAxiosSecure";
 import Swal from "sweetalert2";
 
 const AddAnnouncement = () => {
   const [spinner, setSpinner] = useState(false);
   const axiosSecure = useAxiosSecure();
-  const { user } = useAuth();
+  const { user, userData, token } = useAuth();
   const {
     register,
     handleSubmit,
@@ -17,43 +17,34 @@ const AddAnnouncement = () => {
     reset,
   } = useForm();
 
-  const submitData = (e) => {
-    setSpinner(true);
-    const data = {
-      ...e,
-      authorInfo: {
-        name: user.displayName,
-        imgLink: user?.photoURL ? user?.photoURL : null,
-      },
-    };
-    axiosSecure
-      .post("/announcement", data, { params: { email: user.email } })
-      .then(({ data }) => {
-        if (data.acknowledged) {
-          Swal.fire({
-            icon: "success",
-            title: "Announcement is created",
-          });
-          reset();
-          setSpinner(false);
-        } else {
-          Swal.fire({
-            icon: "error",
-            title: "Announcement is created!",
-          });
-          reset();
-          setSpinner(false);
+  const submitData = async (e) => {
+    try {
+      setSpinner(true);
+      const { data } = await axiosSecure.post(
+        "/announcement",
+        { title: e.title, details: e.des },
+        {
+          params: { email: user.email, userId: userData._id },
+          headers: { Authorization: `Bearer ${token}` },
         }
-      })
-      .catch((err) => {
-        console.error(err);
-        reset();
-        Swal.fire({
-          icon: "error",
-          title: "Announcement is created!",
-        });
-        setSpinner(false);
+      );
+      if (!data.success) {
+        throw new Error("Something went wrong");
+      }
+
+      Swal.fire({
+        icon: "success",
+        title: "Announcement is created",
       });
+    } catch (err) {
+      Swal.fire({
+        icon: "error",
+        text: err,
+      });
+    } finally {
+      setSpinner(false);
+      reset();
+    }
   };
   return (
     <>
