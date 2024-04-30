@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import useAxiosSecure from "@/hooks/useAxiosSecure";
 import useAuth from "@/hooks/useAuth";
-import { Avatar, Button, Modal, Table, Tag } from "keep-react";
+import { Button, Modal, Table, Tag } from "keep-react";
 import Loading from "@/components/Loading";
 import useTitle from "@/hooks/useTitle";
 import { GoCommentDiscussion } from "react-icons/go";
@@ -11,9 +11,9 @@ import PropTypes from "prop-types";
 import Swal from "sweetalert2";
 import { Link } from "react-router-dom";
 import ErrorDataShow from "@/components/ErrorDataShow";
-import commentExcerpt from "@/utility/commentExcerpt";
 import { useState } from "react";
 import moment from "moment";
+import Avatar from "@/components/utilities/Avatar";
 
 const Reports = () => {
   const axiosSecure = useAxiosSecure();
@@ -67,17 +67,17 @@ const Reports = () => {
         <Table.HeadCell className="text-gray-500 border-r border-r-gray-400 text-lg w-14 py-1 px-2">
           #No
         </Table.HeadCell>
-        <Table.HeadCell className="text-gray-500 border-r border-r-gray-400 text-lg min-w-[200px] py-1 px-2">
-          Post Title
-        </Table.HeadCell>
-        <Table.HeadCell className="text-gray-500 border-r border-r-gray-400 text-lg min-w-[350px] py-1 px-2">
-          Comment
+        <Table.HeadCell className="text-gray-500 border-r border-r-gray-400 text-lg min-w-[220px] py-1 px-2">
+          Report user
         </Table.HeadCell>
         <Table.HeadCell className="text-gray-500 border-r border-r-gray-400 text-lg w-fit py-1 px-2">
           Report
         </Table.HeadCell>
         <Table.HeadCell className="text-gray-500 border-r border-r-gray-400 text-lg min-w-[220px] py-1 px-2">
-          Report user
+          Comment user
+        </Table.HeadCell>
+        <Table.HeadCell className="text-gray-500 border-r border-r-gray-400 text-lg min-w-[350px] py-1 px-2">
+          Details
         </Table.HeadCell>
         <Table.HeadCell className="text-gray-500 border-r border-r-gray-400 text-lg w-fit py-1 px-2">
           Action
@@ -119,8 +119,6 @@ const TableRow = ({ inputData, count, reFatch }) => {
   const axiosSecure = useAxiosSecure();
   const { user, userData, token } = useAuth();
   const [showModal, setShowModal] = useState(false);
-
-  const [excerpt, excerptedComment] = commentExcerpt(details);
 
   const commentAddTime = moment(commentCreatedAt).format("D/M/YY, h:m:s a");
   const reportAddTime = moment(createdAt).format("D/M/YY, h:m:s a");
@@ -177,68 +175,8 @@ const TableRow = ({ inputData, count, reFatch }) => {
         {count}
       </Table.Cell>
       <Table.Cell className="border-r-gray-300 py-1 px-2">
-        <Link to={`/post/${postId}`} className="hover:underline">
-          {title}
-        </Link>
-      </Table.Cell>
-      <Table.Cell className="border-r-gray-300 py-1 px-2">
-        {excerpt ? (
-          <div>
-            <p>
-              {excerptedComment}
-              <button
-                type="button"
-                onClick={() => setShowModal((l) => !l)}
-                className="inline-block ml-2 text-blue-600 underline"
-              >
-                Read....
-              </button>
-            </p>
-            <Modal
-              position="center"
-              show={showModal}
-              icon={<GoCommentDiscussion size={25} />}
-              onClose={() => setShowModal((l) => !l)}
-            >
-              <Modal.Header></Modal.Header>
-              <Modal.Body>
-                <p className="text-gray-500">{details}</p>
-              </Modal.Body>
-              <Modal.Footer>
-                <Button type="primary" onClick={() => setShowModal((l) => !l)}>
-                  Done
-                </Button>
-              </Modal.Footer>
-            </Modal>
-          </div>
-        ) : (
-          <p>{excerptedComment}</p>
-        )}
         <div className="flex items-center gap-2">
-          <Avatar
-            shape="circle"
-            bordered={true}
-            img={commentUserPhoto}
-            size="md"
-          />
-          <div>
-            <Link
-              to={`/user/${commentUserId}`}
-              className="-mb-0.5 block hover:underline text-body-4 font-medium text-metal-600"
-            >
-              {commentUserName}
-            </Link>
-            <span>{commentUserEmail}</span>
-          </div>
-        </div>
-        <p className="text-sm font-medium mt-2">Comment: {commentAddTime}</p>
-      </Table.Cell>
-      <Table.Cell className="border-r-gray-300 py-1 px-2 capitalize">
-        {feedback}
-      </Table.Cell>
-      <Table.Cell className="border-r-gray-300 py-1 px-2 whitespace-nowrap">
-        <div className="flex items-center gap-2">
-          <Avatar shape="circle" bordered={true} img={userPhoto} size="md" />
+          <Avatar img={userPhoto} size="sm" />
           <div>
             <Link
               to={`/user/${reportUserId}`}
@@ -249,7 +187,59 @@ const TableRow = ({ inputData, count, reFatch }) => {
             <span>{userEmail}</span>
           </div>
         </div>
-        <p className="text-sm font-medium mt-2">Report: {reportAddTime}</p>
+      </Table.Cell>
+      <Table.Cell className="border-r-gray-300 py-1 px-2 capitalize">
+        {feedback}
+      </Table.Cell>
+      <Table.Cell className="border-r-gray-300 py-1 px-2 capitalize">
+        <div className="flex items-center gap-2">
+          <Avatar img={commentUserPhoto} size="sm" />
+          <div>
+            <Link
+              to={`/user/${commentUserId}`}
+              className="-mb-0.5 block hover:underline text-body-4 font-medium text-metal-600"
+            >
+              {commentUserName}
+            </Link>
+            <span>{commentUserEmail}</span>
+          </div>
+        </div>
+      </Table.Cell>
+      <Table.Cell className="border-r-gray-300 py-1 px-2">
+        <Button
+          onClick={() => setShowModal((l) => !l)}
+          type="primary"
+          size="xs"
+        >
+          Details
+        </Button>
+        <Modal
+          position="center"
+          show={showModal}
+          icon={<GoCommentDiscussion size={25} />}
+          onClose={() => setShowModal((l) => !l)}
+        >
+          <Modal.Header></Modal.Header>
+          <Modal.Body>
+            <div className="text-gray-500">
+              <div>
+                Post:{" "}
+                <Link to={`/post/${postId}`} className="hover:underline">
+                  {title}
+                </Link>
+              </div>
+              <div>Comment: {details}</div>
+              <div>Comment created: {commentAddTime}</div>
+              <div>Report: {feedback}</div>
+              <div>Report created: {reportAddTime}</div>
+            </div>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button type="primary" onClick={() => setShowModal((l) => !l)}>
+              Done
+            </Button>
+          </Modal.Footer>
+        </Modal>
       </Table.Cell>
       <Table.Cell className="border-r-gray-300 py-1 p-2">
         <Button

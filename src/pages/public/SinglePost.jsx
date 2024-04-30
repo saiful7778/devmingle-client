@@ -4,7 +4,7 @@ import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import useAxios from "@/hooks/useAxios";
 import Loading from "@/components/Loading";
-import { Badge, Avatar, Button, Textarea } from "keep-react";
+import { Badge, Button, Textarea } from "keep-react";
 import getPostTime from "@/utility/getPostTime";
 import {
   BsFileArrowUpFill,
@@ -26,6 +26,7 @@ import {
 import ReCAPTCHA from "react-google-recaptcha";
 import useTitle from "@/hooks/useTitle";
 import ErrorDataShow from "@/components/ErrorDataShow";
+import Avatar from "@/components/utilities/Avatar";
 
 const SinglePost = () => {
   const { postID } = useParams();
@@ -50,7 +51,7 @@ const SinglePost = () => {
     queryKey: ["postData", postID],
     queryFn: async () => {
       const { data } = await axios.get(`/post/${postID}`);
-      return data;
+      return data?.data;
     },
   });
 
@@ -66,11 +67,11 @@ const SinglePost = () => {
     tags,
     des,
     createdAt,
-    author: { userName, userPhoto },
+    author: { id: authorId, userName, userPhoto },
     voteCount: { upVote, downVote },
     commentCount,
     comments,
-  } = postData.data;
+  } = postData;
 
   const shareUrl = `${window.location.origin}/post/${postID}`;
   const postTime = getPostTime(createdAt);
@@ -235,9 +236,9 @@ const SinglePost = () => {
         </div>
       </div>
       <div className="flex gap-2 items-center">
-        <Avatar shape="circle" size="sm" bordered img={userPhoto} />
+        <Avatar img={userPhoto} size="sm" />
         <Link
-          to={`/user/${userData?._id}`}
+          to={`/user/${authorId}`}
           className="text-lg font-medium hover:underline"
         >
           {userName}

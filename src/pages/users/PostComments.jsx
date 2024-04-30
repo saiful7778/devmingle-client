@@ -5,13 +5,14 @@ import { useQuery } from "@tanstack/react-query";
 import useAxiosSecure from "@/hooks/useAxiosSecure";
 import useAuth from "@/hooks/useAuth";
 import Loading from "@/components/Loading";
-import { Avatar, Button, Dropdown, Table, Modal, Tag } from "keep-react";
+import { Button, Dropdown, Table, Modal, Tag } from "keep-react";
 import getPostTime from "@/utility/getPostTime";
 import { GoCommentDiscussion } from "react-icons/go";
 import PropTypes from "prop-types";
 import Swal from "sweetalert2";
 import ErrorDataShow from "@/components/ErrorDataShow";
 import commentExcerpt from "@/utility/commentExcerpt";
+import Avatar from "@/components/utilities/Avatar";
 
 const PostComments = () => {
   const { postId } = useParams();
@@ -141,15 +142,15 @@ const TableRow = ({ inputData }) => {
     <Table.Row className="hover:bg-gray-200 even:border-gray-300 even:bg-slate-200">
       <Table.Cell className="border-r-gray-300 py-1 p-2">
         <div className="flex items-center gap-2">
-          <Avatar shape="circle" bordered={true} img={userPhoto} size="md" />
+          <Avatar img={userPhoto} size="sm" />
           <div>
             <Link
               to={`/user/${userId}`}
-              className="-mb-0.5 block text-body-4 hover:underline font-medium text-metal-600"
+              className="-mb-2 block text-body-4 hover:underline font-medium text-metal-600"
             >
               {userName}
             </Link>
-            <span>{userEmail}</span>
+            <span className="text-xs">{userEmail}</span>
           </div>
         </div>
       </Table.Cell>

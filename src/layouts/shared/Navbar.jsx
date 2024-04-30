@@ -18,7 +18,7 @@ const Navbar = () => {
     queryKey: ["announcementCount"],
     queryFn: async () => {
       const { data } = await axios.get("/announcements/count");
-      return data;
+      return data?.data;
     },
   });
 
@@ -61,11 +61,7 @@ const Navbar = () => {
           >
             <IoNotifications size="30" />
             <div className="bg-amber-500 absolute rounded-3xl flex items-center justify-center w-[30px] h-[15px] -top-px -right-3 text-body-6">
-              {isPending ? (
-                <Spinner size="xs" color="info" />
-              ) : (
-                data?.data?.count
-              )}
+              {isPending ? <Spinner size="xs" color="info" /> : data?.count}
             </div>
           </button>
           {user ? <UserLogged user={user} logout={logout} /> : <UserLogout />}
