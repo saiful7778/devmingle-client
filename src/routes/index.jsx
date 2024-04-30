@@ -9,6 +9,7 @@ const DashboardLayout = lazy(() => import("@/layouts/DashboardLayout"));
 import Home from "@/pages/public/Home";
 import AllAnnouncement from "@/pages/public/AllAnnouncement";
 const SinglePost = lazy(() => import("@/pages/public/SinglePost"));
+const UserProfile = lazy(() => import("@/pages/public/UserProfile"));
 
 // authentication pages
 import Login from "@/pages/auth/Login";
@@ -36,7 +37,6 @@ import PrivateRoute from "./PrivateRoute";
 import AuthRoute from "./AuthRoute";
 import ErrorPage from "@/pages/ErrorPage";
 import SuspenseProvider from "@/context/SuspenseContext";
-import UserProfile from "@/pages/public/UserProfile";
 
 const route = createBrowserRouter([
   {

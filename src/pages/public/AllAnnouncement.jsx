@@ -1,10 +1,12 @@
-import { Avatar, Empty } from "keep-react";
+import { Empty } from "keep-react";
 import PropTypes from "prop-types";
 import useAxios from "@/hooks/useAxios";
 import { useQuery } from "@tanstack/react-query";
 import Loading from "@/components/Loading";
 import notFoundImg from "@/assets/img/not-found.svg";
 import ErrorDataShow from "@/components/ErrorDataShow";
+import { Link } from "react-router-dom";
+import Avatar from "@/components/utilities/Avatar";
 
 const AllAnnouncement = () => {
   const axios = useAxios();
@@ -16,7 +18,7 @@ const AllAnnouncement = () => {
     queryKey: ["allAnnouncement"],
     queryFn: async () => {
       const { data } = await axios.get("/announcements");
-      return data;
+      return data?.data;
     },
   });
   if (isLoading) {
@@ -26,7 +28,7 @@ const AllAnnouncement = () => {
     return <ErrorDataShow />;
   }
 
-  if (allAnnouncement?.data?.length === 0) {
+  if (allAnnouncement?.length === 0) {
     return (
       <Empty
         title="Oops! No announcement found"
@@ -38,7 +40,7 @@ const AllAnnouncement = () => {
   return (
     <div className="bg-gray-100">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-        {allAnnouncement?.data?.map((ele, idx) => (
+        {allAnnouncement?.map((ele, idx) => (
           <AnnouncementItem key={"announcement" + idx} inputData={ele} />
         ))}
       </div>
@@ -50,7 +52,7 @@ const AnnouncementItem = ({ inputData }) => {
   const {
     title,
     details,
-    author: { userImage, userName },
+    author: { id: authorId, userPhoto, userName },
   } = inputData;
 
   return (
@@ -60,8 +62,13 @@ const AnnouncementItem = ({ inputData }) => {
         <p className="text-sm">{details}</p>
       </div>
       <div className="flex gap-1 items-center">
-        <Avatar shape="circle" size="sm" bordered img={userImage} />
-        <h6 className="text-lg font-medium">{userName}</h6>
+        <Avatar size="sm" img={userPhoto} />
+        <Link
+          to={`/user/${authorId}`}
+          className="text-lg font-medium hover:underline"
+        >
+          {userName}
+        </Link>
       </div>
     </div>
   );

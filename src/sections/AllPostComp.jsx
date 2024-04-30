@@ -10,7 +10,7 @@ import ErrorDataShow from "@/components/ErrorDataShow";
 const AllPostComp = ({ tag, currentPage, setCurrentPage }) => {
   const axios = useAxios();
   const [totalItems, setTotalItems] = useState(0);
-  const itemsPerPage = 5;
+  const itemsPerPage = 6;
   const {
     data: posts,
     isLoading,
