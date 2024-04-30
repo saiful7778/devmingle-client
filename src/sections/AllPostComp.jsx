@@ -36,7 +36,7 @@ const AllPostComp = ({ tag, currentPage, setCurrentPage }) => {
   if (isError) {
     return <ErrorDataShow />;
   }
-  if (posts.length < 1) {
+  if (posts?.length < 1) {
     return <ErrorDataShow />;
   }
   const numberOfPage = Math.ceil(totalItems / itemsPerPage);
