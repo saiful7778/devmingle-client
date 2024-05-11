@@ -10,7 +10,7 @@ import useAuth from "../../hooks/useAuth";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 const MemberShip = () => {
-  const { user } = useAuth();
+  const { user, token, userData } = useAuth();
   const axiosSecure = useAxiosSecure();
   const [clientSecret, setClientSecret] = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -26,11 +26,14 @@ const MemberShip = () => {
       const { data } = await axiosSecure.post(
         "/payment/create_intent",
         { price },
-        { params: { email: user?.email } }
+        {
+          params: { email: user.email, userId: userData._id },
+          headers: { Authorization: `Bearer ${token}` },
+        }
       );
       setClientSecret(data.clientSecret);
     })();
-  }, [axiosSecure, user]);
+  }, [axiosSecure, user, token, userData]);
 
   const appearance = {
     theme: "stripe",

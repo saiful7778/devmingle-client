@@ -71,9 +71,11 @@ const route = createBrowserRouter([
       {
         path: "/membership",
         element: (
-          <PrivateRoute>
-            <MemberShip />
-          </PrivateRoute>
+          <SuspenseProvider>
+            <PrivateRoute>
+              <MemberShip />
+            </PrivateRoute>
+          </SuspenseProvider>
         ),
       },
       {

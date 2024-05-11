@@ -8,7 +8,7 @@ import useAxiosSecure from "../hooks/useAxiosSecure";
 import Swal from "sweetalert2";
 
 const PaymentForm = ({ clientSecret }) => {
-  const { user } = useAuth();
+  const { user, userData, token } = useAuth();
   const axiosSecure = useAxiosSecure();
   const [message, setMessage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -30,48 +30,57 @@ const PaymentForm = ({ clientSecret }) => {
       return;
     }
     setIsLoading(true);
-
-    const card = elements.getElement(CardElement);
-
-    const { error, paymentIntent } = await stripe.confirmCardPayment(
-      clientSecret,
-      {
-        payment_method: {
-          card: card,
-          billing_details: {
-            email: user?.email || "anonymous",
-            name: user?.displayName || "anonymous",
+    setMessage("");
+    try {
+      const card = elements.getElement(CardElement);
+      const { error, paymentIntent } = await stripe.confirmCardPayment(
+        clientSecret,
+        {
+          payment_method: {
+            card: card,
+            billing_details: {
+              email: user?.email || "anonymous",
+              name: user?.displayName || "anonymous",
+            },
           },
-        },
-      }
-    );
-    if (error) {
-      console.log("[error]", error);
-      setMessage(error.message);
-    } else {
-      console.log("[PaymentMethod]", paymentIntent);
-      if (paymentIntent.status === "succeeded") {
-        axiosSecure
-          .patch("/payment", {}, { params: { email: user?.email } })
-          .then(({ data }) => {
-            if (data?.modifiedCount) {
-              Swal.fire({
-                icon: "success",
-                text: "Congratulations your now a gold user",
-              });
+        }
+      );
+      if (error) {
+        console.log("[error]", error);
+        setMessage(error.message);
+      } else {
+        console.log("[PaymentMethod]", paymentIntent);
+        if (paymentIntent.status === "succeeded") {
+          const { data } = await axiosSecure.patch(
+            "/payment",
+            {},
+            {
+              params: { email: user.email, userId: userData._id },
+              headers: { Authorization: `Bearer ${token}` },
             }
-          })
-          .catch((err) => {
-            console.error(err);
+          );
+          if (data?.data?.modifiedCount) {
+            Swal.fire({
+              icon: "success",
+              text: "Congratulations your now a gold user",
+            });
+          } else {
             Swal.fire({
               icon: "error",
-              text: "Payment faild",
+              text: "Payment failed",
             });
-          });
+          }
+        }
       }
+    } catch {
+      Swal.fire({
+        icon: "error",
+        text: "Payment failed",
+      });
+      setMessage("Payment failed");
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   return (

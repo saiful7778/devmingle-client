@@ -23,7 +23,7 @@ const MyPost = () => {
         params: { email: user.email, userId: userData._id },
         headers: { Authorization: `Bearer ${token}` },
       });
-      return data?.data;
+      return data;
     },
   });
   if (isLoading) {
@@ -32,7 +32,7 @@ const MyPost = () => {
   if (isError) {
     return <ErrorDataShow />;
   }
-  if (myPost?.length < 1) {
+  if (myPost?.data?.length < 1) {
     return <ErrorDataShow />;
   }
   changeTitle("My all post - dashboard");
@@ -41,10 +41,10 @@ const MyPost = () => {
     <div className="bg-gray-100">
       <div className="flex items-center gap-5 my-5 px-6">
         <p className="text-body-1 font-semibold text-metal-600">Total posts:</p>
-        <Tag color="info">{myPost?.length} post</Tag>
+        <Tag color="info">{myPost?.totalCount} post</Tag>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-        {myPost?.map((post, idx) => (
+        {myPost?.data?.map((post, idx) => (
           <UserPost
             key={"user-post" + idx}
             inputData={post}
